@@ -5,7 +5,7 @@
   "scripts": {
     "develop": "strapi develop",
     "start": "strapi start",
-    "build": "strapi build && powershell -ExecutionPolicy Bypass -File scripts/copy-schemas.ps1"
+    "build": "strapi build"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.13.0",
