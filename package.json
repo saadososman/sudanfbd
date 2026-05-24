@@ -1,0 +1,13 @@
+{
+  "name": "sudanese-forum-platform",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "dev:frontend": "npm --prefix frontend run dev",
+    "dev:backend": "npm --prefix backend run develop"
+  },
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
