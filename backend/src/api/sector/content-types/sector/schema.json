@@ -5,15 +5,10 @@
     "singularName": "sector",
     "pluralName": "sectors",
     "displayName": "Sector",
-    "description": "Development sectors for the forum"
+    "description": "Forum development sectors"
   },
   "options": {
     "draftAndPublish": true
-  },
-  "pluginOptions": {
-    "i18n": {
-      "localized": true
-    }
   },
   "attributes": {
     "title": {

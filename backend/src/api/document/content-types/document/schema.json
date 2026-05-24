@@ -10,11 +10,6 @@
   "options": {
     "draftAndPublish": true
   },
-  "pluginOptions": {
-    "i18n": {
-      "localized": true
-    }
-  },
   "attributes": {
     "title": {
       "type": "string",
@@ -27,10 +22,10 @@
     "summary": {
       "type": "text"
     },
-    "locale": {
+    "language": {
       "type": "enumeration",
       "enum": ["ar", "en"],
-      "default": "en",
+      "default": "ar",
       "required": true
     },
     "pdf": {
