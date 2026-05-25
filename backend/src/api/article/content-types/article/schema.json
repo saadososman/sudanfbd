@@ -4,23 +4,33 @@
   "info": {
     "singularName": "article",
     "pluralName": "articles",
-    "displayName": "Article"
+    "displayName": "Article",
+    "description": ""
   },
   "options": {
     "draftAndPublish": true
   },
+  "pluginOptions": {},
   "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
     "summary": {
       "type": "text"
+    },
+    "content": {
+      "type": "richtext"
     },
     "coverImage": {
       "type": "media",
       "multiple": false,
+      "required": false,
       "allowedTypes": [
         "images"
       ]
     },
-    "published": {
+    "publishedAt": {
       "type": "datetime"
     }
   }
