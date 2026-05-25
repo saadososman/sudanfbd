@@ -9,13 +9,14 @@
     "build": "strapi build"
   },
   "dependencies": {
+    "@rollup/rollup-linux-x64-gnu": "4.60.4",
     "@strapi/strapi": "^5.0.0",
     "@swc/core": "1.7.36",
-    "@rollup/rollup-linux-x64-gnu": "4.60.4",
     "pg": "^8.11.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.30.3",
+    "sharp": "^0.33.5",
     "styled-components": "^6.1.13"
   },
   "optionalDependencies": {
