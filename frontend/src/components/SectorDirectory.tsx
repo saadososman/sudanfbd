@@ -2,77 +2,70 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowUpRight, Search } from "lucide-react";
-import { SectorIcon } from "@/components/SectorIcon";
-import { dictionary, type Locale } from "@/lib/i18n";
-import { categoryLabel, sectorCategories, sectors, sectorText, type SectorCategory } from "@/lib/sectors";
+import { Search } from "lucide-react";
+import type { Locale } from "@/lib/i18n";
+import type { Sector } from "@/lib/strapi";
 
-export function SectorDirectory({ locale }: { locale: Locale }) {
-  const t = dictionary[locale];
+type Props = {
+  locale: Locale;
+  sectors: Sector[];
+};
+
+export function SectorDirectory({ locale, sectors }: Props) {
   const [query, setQuery] = useState("");
-  const [category, setCategory] = useState<"all" | SectorCategory>("all");
+
+  const isArabic = locale === "ar";
 
   const filteredSectors = useMemo(() => {
     const normalized = query.trim().toLowerCase();
-    return sectors.filter((sector) => {
-      const text = sectorText(sector, locale);
-      const matchesCategory = category === "all" || sector.category === category;
-      const matchesQuery = !normalized || `${text.title} ${text.summary}`.toLowerCase().includes(normalized);
-      return matchesCategory && matchesQuery;
-    });
-  }, [category, locale, query]);
 
-  const filters: Array<{ label: string; value: "all" | SectorCategory }> = [
-    { label: t.allSectors, value: "all" },
-    ...sectorCategories.map((item) => ({ label: item.label[locale], value: item.value }))
-  ];
+    if (!normalized) return sectors;
+
+    return sectors.filter((sector) => {
+      return (
+        sector.title.toLowerCase().includes(normalized) ||
+        sector.summary.toLowerCase().includes(normalized) ||
+        sector.category.toLowerCase().includes(normalized)
+      );
+    });
+  }, [query, sectors]);
 
   return (
     <div className="sector-directory">
       <div className="sector-tools reveal">
         <label className="sector-search">
-          <Search size={19} />
-          <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t.sectorsSearch} />
+          <Search size={18} />
+          <input
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder={isArabic ? "ابحث في القطاعات" : "Search sectors"}
+          />
         </label>
-        <div className="sector-filters" aria-label={t.sectorsTitle}>
-          {filters.map((filter) => (
-            <button
-              className={category === filter.value ? "active" : ""}
-              key={filter.value}
-              onClick={() => setCategory(filter.value)}
-              type="button"
-            >
-              {filter.label}
-            </button>
+      </div>
+
+      {filteredSectors.length === 0 ? (
+        <p className="sector-empty">
+          {isArabic
+            ? "لا توجد قطاعات منشورة حالياً من لوحة Strapi."
+            : "No published sectors are available from Strapi yet."}
+        </p>
+      ) : (
+        <div className="sector-grid">
+          {filteredSectors.map((sector) => (
+            <article className="sector-card reveal" key={sector.id}>
+              <span className="sector-category">{sector.category}</span>
+
+              <h2>{sector.title}</h2>
+
+              <p>{sector.summary}</p>
+
+              <Link href={`/${locale}/sectors/${sector.slug}`}>
+                {isArabic ? "عرض القطاع" : "View sector"}
+              </Link>
+            </article>
           ))}
         </div>
-      </div>
-      <div className="sector-grid directory-grid">
-        {filteredSectors.map((sector, index) => {
-          const text = sectorText(sector, locale);
-          return (
-            <Link
-              className={`sector-card directory-card ${sector.category === "governance" ? "governance-card" : ""}`}
-              href={`/${locale}/sectors/${sector.slug}`}
-              key={sector.slug}
-              style={{ animationDelay: `${index * 35}ms` }}
-            >
-              <span className="sector-icon">
-                <SectorIcon name={sector.icon} />
-              </span>
-              <span>
-                <small>{categoryLabel(sector.category, locale)}</small>
-                <h3>{text.title}</h3>
-                <p>{text.summary}</p>
-              </span>
-              <span className="sector-meta">
-                {t.readMore}
-                <ArrowUpRight size={17} />
-              </span>
-            </Link>
-          );
-        })}
-      </div>
+      )}
     </div>
   );
 }
