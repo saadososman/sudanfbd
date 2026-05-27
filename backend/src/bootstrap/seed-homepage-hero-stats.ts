@@ -1,3 +1,9 @@
+import {
+  getDocumentId,
+  publishIfSupported,
+  type SeedStrapi
+} from "./helpers";
+
 type Locale = "ar" | "en";
 
 type HeroSeed = {
@@ -82,14 +88,7 @@ function hasHeroOrStatsSections(sections: unknown) {
   });
 }
 
-export async function seedHomepageHeroStats(strapi: {
-  documents: (uid: string) => {
-    findFirst: (params: Record<string, unknown>) => Promise<{ sections?: unknown } | null>;
-    create: (params: Record<string, unknown>) => Promise<unknown>;
-    update: (params: Record<string, unknown>) => Promise<unknown>;
-    publish: (params: Record<string, unknown>) => Promise<unknown>;
-  };
-}) {
+export async function seedHomepageHeroStats(strapi: SeedStrapi) {
   const homepage = strapi.documents("api::homepage.homepage");
 
   for (const locale of ["ar", "en"] as const) {
@@ -114,32 +113,15 @@ export async function seedHomepageHeroStats(strapi: {
       continue;
     }
 
-    if (existing) {
-      const updated = await homepage.update({
-        documentId: (existing as { documentId?: string }).documentId,
-        locale,
-        data: { sections }
-      });
+    let documentId = getDocumentId(existing);
 
-      const documentId =
-        (updated as { documentId?: string }).documentId ??
-        (existing as { documentId?: string }).documentId;
-
-      if (documentId) {
-        await homepage.publish({ documentId, locale });
-      }
-
-      continue;
-    }
-
-    const created = await homepage.create({
-      locale,
-      data: { sections }
-    });
-
-    const documentId = (created as { documentId?: string }).documentId;
     if (documentId) {
-      await homepage.publish({ documentId, locale });
+      await homepage.update({ documentId, locale, data: { sections } });
+    } else {
+      const created = await homepage.create({ locale, data: { sections } });
+      documentId = getDocumentId(created);
     }
+
+    await publishIfSupported(homepage, documentId, locale, true);
   }
 }
