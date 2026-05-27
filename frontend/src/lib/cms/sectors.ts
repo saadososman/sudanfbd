@@ -3,14 +3,9 @@ import {
   parseJsonArray,
   strapiFetch
 } from "@/lib/cms/client";
+import { categoryLabel } from "@/lib/cms/sector-categories";
 import type { CmsSector, SectorCategory } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
-import {
-  categoryLabel,
-  getSector as getFallbackSector,
-  sectors as fallbackSectors,
-  sectorText
-} from "@/lib/sectors";
 
 const sectorCategories: SectorCategory[] = [
   "economic",
@@ -27,25 +22,6 @@ function isSectorCategory(value: unknown): value is SectorCategory {
 function stripRichText(value: unknown) {
   if (typeof value !== "string") return "";
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function mapFallbackSectors(locale: Locale): CmsSector[] {
-  return fallbackSectors.map((sector, index) => {
-    const text = sectorText(sector, locale);
-
-    return {
-      id: sector.slug,
-      slug: sector.slug,
-      title: text.title,
-      summary: text.summary,
-      body: text.body,
-      outputs: text.outputs,
-      category: sector.category,
-      categoryLabel: categoryLabel(sector.category, locale),
-      icon: sector.icon,
-      order: index
-    };
-  });
 }
 
 function mapSectorItem(
@@ -91,57 +67,22 @@ function mapSectorItem(
   };
 }
 
-export function getFallbackSectors(locale: Locale) {
-  return mapFallbackSectors(locale);
-}
-
 export async function fetchSectors(locale: Locale): Promise<CmsSector[]> {
-  const fallback = mapFallbackSectors(locale);
-
   const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     "/api/sectors?sort=order:asc&populate[coverImage]=*",
     { locale, revalidate: 300, tags: [`sectors-${locale}`] }
   );
 
-  const items = (payload?.data ?? [])
+  return (payload?.data ?? [])
     .map((item) => mapSectorItem(item as Record<string, unknown>, locale))
     .filter((item): item is CmsSector => item !== null)
     .sort((a, b) => a.order - b.order);
-
-  return items.length > 0 ? items : fallback;
 }
 
 export async function fetchSectorBySlug(
   locale: Locale,
   slug: string
 ): Promise<CmsSector | null> {
-  const fallback = getFallbackSector(slug);
-  if (fallback) {
-    const text = sectorText(fallback, locale);
-    const fallbackSector: CmsSector = {
-      id: fallback.slug,
-      slug: fallback.slug,
-      title: text.title,
-      summary: text.summary,
-      body: text.body,
-      outputs: text.outputs,
-      category: fallback.category,
-      categoryLabel: categoryLabel(fallback.category, locale),
-      icon: fallback.icon,
-      order: fallbackSectors.findIndex((sector) => sector.slug === slug)
-    };
-
-    const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-      `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[coverImage]=*`,
-      { locale, revalidate: 300, tags: [`sector-${slug}-${locale}`] }
-    );
-
-    const item = (payload?.data ?? [])[0] as Record<string, unknown> | undefined;
-    if (!item) return fallbackSector;
-
-    return mapSectorItem(item, locale) ?? fallbackSector;
-  }
-
   const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&populate[coverImage]=*`,
     { locale, revalidate: 300, tags: [`sector-${slug}-${locale}`] }
@@ -157,7 +98,7 @@ export async function fetchSectorSlugs(): Promise<string[]> {
     { locale: "en", revalidate: 300, tags: ["sector-slugs"] }
   );
 
-  const slugs = (payload?.data ?? [])
+  return (payload?.data ?? [])
     .map((item) => {
       const fields =
         (item as Record<string, unknown>).attributes &&
@@ -167,12 +108,6 @@ export async function fetchSectorSlugs(): Promise<string[]> {
       return fields.slug;
     })
     .filter((slug): slug is string => typeof slug === "string");
-
-  if (slugs.length > 0) {
-    return slugs;
-  }
-
-  return fallbackSectors.map((sector) => sector.slug);
 }
 
 export async function fetchSectorIdBySlug(slug: string, locale: Locale = "en") {

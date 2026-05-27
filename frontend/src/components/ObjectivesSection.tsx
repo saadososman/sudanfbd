@@ -1,5 +1,5 @@
 import { ArrowUpRight, Blocks, FileCheck2, Network, Scale } from "lucide-react";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 const icons = [FileCheck2, Network, Scale, Blocks];
 
@@ -15,9 +15,9 @@ export function ObjectivesSection({
   content
 }: {
   locale: Locale;
-  content?: ObjectivesContent;
+  content: ObjectivesContent;
 }) {
-  const objectives = content ?? dictionary[locale].objectives;
+  const objectives = content;
 
   return (
     <section className="section objectives-section">

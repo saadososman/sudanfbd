@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { CheckCircle2 } from "lucide-react";
 import { PageTitle } from "@/components/PageTitle";
 import { SectorIcon } from "@/components/SectorIcon";
-import { fetchSectorBySlug, fetchSectorSlugs } from "@/lib/cms";
-import { dictionary, type Locale } from "@/lib/i18n";
+import { fetchSectorBySlug, fetchSectorSlugs, fetchSiteConfig, getNavLabel } from "@/lib/cms";
+import type { Locale } from "@/lib/i18n";
 
 export async function generateStaticParams() {
   const slugs = await fetchSectorSlugs();
@@ -21,12 +21,15 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const sector = await fetchSectorBySlug(locale, slug);
+  const [sector, siteConfig] = await Promise.all([
+    fetchSectorBySlug(locale, slug),
+    fetchSiteConfig(locale)
+  ]);
 
   if (!sector) return {};
 
   return {
-    title: `${sector.title} | ${dictionary[locale].brand}`,
+    title: `${sector.title} | ${siteConfig.siteName}`,
     description: sector.summary
   };
 }
@@ -37,18 +40,19 @@ export default async function SectorPage({
   params: Promise<{ locale: Locale; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const sector = await fetchSectorBySlug(locale, slug);
+  const [sector, siteConfig] = await Promise.all([
+    fetchSectorBySlug(locale, slug),
+    fetchSiteConfig(locale)
+  ]);
 
   if (!sector) notFound();
-
-  const t = dictionary[locale];
 
   return (
     <>
       <PageTitle
         title={sector.title}
         intro={sector.summary}
-        crumb={t.nav.sectors}
+        crumb={getNavLabel(siteConfig, "sectors")}
       />
       <section className="section sector-detail-section">
         <div className="container sector-detail-layout">

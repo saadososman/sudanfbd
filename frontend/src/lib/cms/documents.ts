@@ -1,5 +1,4 @@
 import { getMediaUrl, strapiFetch, unwrapCollectionItems } from "@/lib/cms/client";
-import { getFallbackDocuments } from "@/lib/cms/fallbacks-documents";
 import type { Locale } from "@/lib/i18n";
 
 export type DocumentItem = {
@@ -71,20 +70,14 @@ function mapDocumentItem(
 }
 
 export async function fetchDocuments(locale: Locale): Promise<DocumentItem[]> {
-  const fallback = getFallbackDocuments(locale);
-
   const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     "/api/forum-documents?populate[file]=*&populate[sector]=*&sort=publishedAt:desc&pagination[pageSize]=100",
     { locale, revalidate: 120, tags: [`documents-${locale}`], timeoutMs: 8000 }
   );
 
-  if (!payload) return [...fallback];
+  if (!payload?.data?.length) return [];
 
-  const documents = unwrapCollectionItems(payload)
+  return unwrapCollectionItems(payload)
     .map((item) => mapDocumentItem(item as Record<string, unknown>, locale))
     .filter((item): item is DocumentItem => item !== null);
-
-  return documents.length > 0 ? documents : [...fallback];
 }
-
-export { getFallbackDocuments, fallbackDocuments } from "@/lib/cms/fallbacks-documents";

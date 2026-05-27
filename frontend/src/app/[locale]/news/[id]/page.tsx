@@ -1,23 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowUpRight } from "lucide-react";
-import { ArticleContent } from "@/components/ArticleContent";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { PageTitle } from "@/components/PageTitle";
-import { fetchArticle, fetchArticles, formatArticleDate } from "@/lib/articles";
+import { ArticleContent } from "@/components/ArticleContent";
+import { fetchArticle, formatArticleDate } from "@/lib/articles";
+import { fetchSiteConfig, getNavLabel } from "@/lib/cms";
 import { dictionary, type Locale } from "@/lib/i18n";
-
-export async function generateStaticParams() {
-  const [arArticles, enArticles] = await Promise.all([
-    fetchArticles("ar"),
-    fetchArticles("en")
-  ]);
-
-  return [
-    ...arArticles.map((article) => ({ locale: "ar", id: article.id })),
-    ...enArticles.map((article) => ({ locale: "en", id: article.id }))
-  ];
-}
+import { localePath } from "@/lib/locale-path";
 
 export async function generateMetadata({
   params
@@ -25,16 +15,18 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const article = await fetchArticle(locale, id);
-  const t = dictionary[locale];
+  const [article, siteConfig] = await Promise.all([
+    fetchArticle(locale, id),
+    fetchSiteConfig(locale)
+  ]);
 
   if (!article) {
-    return { title: t.newsTitle };
+    return {};
   }
 
   return {
-    title: `${article.title} | ${t.brand}`,
-    description: article.excerpt || t.newsIntro
+    title: `${article.title} | ${siteConfig.siteName}`,
+    description: article.excerpt
   };
 }
 
@@ -44,12 +36,13 @@ export default async function NewsArticlePage({
   params: Promise<{ locale: Locale; id: string }>;
 }) {
   const { locale, id } = await params;
+  const [article, siteConfig] = await Promise.all([
+    fetchArticle(locale, id),
+    fetchSiteConfig(locale)
+  ]);
   const t = dictionary[locale];
-  const article = await fetchArticle(locale, id);
 
-  if (!article) {
-    notFound();
-  }
+  if (!article) notFound();
 
   return (
     <>
@@ -58,24 +51,16 @@ export default async function NewsArticlePage({
         intro={
           article.publishedAt
             ? `${t.publishedOn} ${formatArticleDate(article.publishedAt, locale)}`
-            : t.newsIntro
+            : undefined
         }
-        crumb={t.nav.news}
+        crumb={getNavLabel(siteConfig, "news")}
       />
       <section className="section">
-        <div className="container article-page-layout">
-          <article className="panel article-detail reveal">
-            {article.coverImageUrl ? (
-              <div className="article-cover">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={article.coverImageUrl} alt="" />
-              </div>
-            ) : null}
-            <ArticleContent content={article.content} />
-          </article>
-          <Link className="button light article-back-link" href={`/${locale}/news`}>
+        <div className="container article-layout">
+          <ArticleContent content={article.content} />
+          <Link className="button light article-back" href={localePath(locale, "news")}>
+            <ArrowLeft size={18} />
             {t.backToNews}
-            <ArrowUpRight size={18} />
           </Link>
         </div>
       </section>

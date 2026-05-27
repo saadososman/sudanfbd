@@ -1,8 +1,14 @@
 import type { Metadata } from "next";
 import { PageTitle } from "@/components/PageTitle";
 import { SectorDirectory } from "@/components/SectorDirectory";
-import { fetchSectors } from "@/lib/cms";
-import { dictionary, type Locale } from "@/lib/i18n";
+import {
+  fetchHomepage,
+  fetchSectors,
+  fetchSiteConfig,
+  getNavLabel,
+  getSectorsListingFromHomepage
+} from "@/lib/cms";
+import type { Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
   params
@@ -10,11 +16,15 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = dictionary[locale];
+  const homepage = await fetchHomepage(locale);
+  const listing = getSectorsListingFromHomepage(homepage);
+  const siteConfig = await fetchSiteConfig(locale);
 
   return {
-    title: `${t.sectorsTitle} | ${t.brand}`,
-    description: t.sectorsIntro
+    title: listing.title
+      ? `${listing.title} | ${siteConfig.siteName}`
+      : siteConfig.defaultSeo?.metaTitle,
+    description: listing.intro || siteConfig.defaultSeo?.metaDescription
   };
 }
 
@@ -24,19 +34,20 @@ export default async function SectorsPage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const t = dictionary[locale];
-  const sectors = await fetchSectors(locale);
-
-  const heroIntro =
-    locale === "ar"
-      ? "خطط قابلة للتنفيذ تدعم بناء السودان واستقراره وتنميته."
-      : t.sectorsIntro;
-
-  const heroCrumb = locale === "ar" ? "عن الملتقى" : t.nav.sectors;
+  const [homepage, sectors, siteConfig] = await Promise.all([
+    fetchHomepage(locale),
+    fetchSectors(locale),
+    fetchSiteConfig(locale)
+  ]);
+  const listing = getSectorsListingFromHomepage(homepage);
 
   return (
     <>
-      <PageTitle title={t.sectorsTitle} intro={heroIntro} crumb={heroCrumb} />
+      <PageTitle
+        title={listing.title}
+        intro={listing.intro}
+        crumb={getNavLabel(siteConfig, "sectors")}
+      />
 
       <section className="section sectors-page-section">
         <div className="container">

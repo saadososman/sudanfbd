@@ -37,7 +37,7 @@ import type {
   CmsTextCard
 } from "@/lib/cms/types";
 import { localePath } from "@/lib/locale-path";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 const methodologyIcons = [TimerReset, ClipboardCheck, Network, CheckCircle2];
 const frameworkIcons = [
@@ -225,13 +225,13 @@ function StatsSectionBlock({ section }: { section: CmsStatsSection }) {
   );
 }
 
-function isAboutMissionLegacySection(section: CmsRichContentSection, locale: Locale) {
+function isAboutMissionLegacySection(section: CmsRichContentSection) {
   return (
     Boolean(section.bulletPoints?.length) &&
+    Boolean(section.paragraphs?.length) &&
     !section.cards?.length &&
     !section.items?.length &&
-    !section.phases?.length &&
-    section.title === dictionary[locale].about.mission
+    !section.phases?.length
   );
 }
 
@@ -256,7 +256,7 @@ function LegacyRichContentSection({
     return <MethodologyCardsBlock cards={section.cards} />;
   }
 
-  if (isAboutMissionLegacySection(section, locale)) {
+  if (isAboutMissionLegacySection(section)) {
     return (
       <MissionValuesSectionBlock
         section={{

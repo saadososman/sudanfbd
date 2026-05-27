@@ -3,6 +3,5 @@ export {
   fetchSectorBySlug,
   fetchSectorIdBySlug,
   fetchSectors,
-  fetchSectorSlugs,
-  getFallbackSectors
+  fetchSectorSlugs
 } from "@/lib/cms/sectors";

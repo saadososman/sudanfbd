@@ -1,12 +1,10 @@
-import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
-import { mergeHomepageWithCms } from "@/lib/cms/homepage-merge";
 import {
   mapHomeSections,
   mapSeo,
   strapiFetch,
   unwrapSingleType
 } from "@/lib/cms/client";
-import type { CmsHomepage } from "@/lib/cms/types";
+import type { CmsContentTeaserSection, CmsHomepage } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
 type HomepagePayload = {
@@ -25,21 +23,45 @@ const homepagePopulate =
   "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
   "&populate[seo][populate][ogImage]=*";
 
-export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
-  const fallback = getFallbackHomepage(locale);
+export function getSectorsListingFromHomepage(homepage: CmsHomepage) {
+  const section = homepage.sections.find(
+    (item): item is CmsContentTeaserSection =>
+      item.__component === "sections.content-teaser-section" &&
+      item.contentType === "sectors"
+  );
 
+  return {
+    title: section?.title ?? "",
+    intro: section?.intro ?? ""
+  };
+}
+
+export function getNewsListingFromHomepage(homepage: CmsHomepage) {
+  const section = homepage.sections.find(
+    (item): item is CmsContentTeaserSection =>
+      item.__component === "sections.content-teaser-section" &&
+      item.contentType === "news"
+  );
+
+  return {
+    title: section?.title ?? "",
+    intro: section?.intro ?? ""
+  };
+}
+
+export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
   const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
     `/api/homepage?${homepagePopulate}`,
     { locale, revalidate: 300, tags: [`homepage-${locale}`] }
   );
 
   const fields = unwrapSingleType<HomepagePayload>(payload);
-  if (!fields) return fallback;
-
-  const cmsSections = mapHomeSections(fields.sections);
+  if (!fields) {
+    return { sections: [] };
+  }
 
   return {
-    seo: mapSeo(fields) ?? fallback.seo,
-    sections: mergeHomepageWithCms(fallback, cmsSections).sections
+    seo: mapSeo(fields),
+    sections: mapHomeSections(fields.sections)
   };
 }

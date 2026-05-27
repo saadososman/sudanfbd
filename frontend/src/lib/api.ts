@@ -1,6 +1,1 @@
-export {
-  fetchDocuments,
-  fallbackDocuments,
-  getFallbackDocuments,
-  type DocumentItem
-} from "@/lib/cms/documents";
+export { fetchDocuments, type DocumentItem } from "@/lib/cms/documents";

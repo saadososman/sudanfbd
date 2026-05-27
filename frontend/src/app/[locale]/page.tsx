@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { HomeSectionRenderer } from "@/components/HomeSectionRenderer";
 import { fetchHomepage } from "@/lib/cms";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 export async function generateMetadata({
   params
@@ -10,11 +10,10 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const homepage = await fetchHomepage(locale);
-  const t = dictionary[locale];
 
   return {
-    title: homepage.seo?.metaTitle ?? `${t.brand} | ${t.nav.home}`,
-    description: homepage.seo?.metaDescription ?? t.manifesto.paragraphs[0],
+    title: homepage.seo?.metaTitle,
+    description: homepage.seo?.metaDescription,
     alternates: {
       languages: {
         ar: "/ar",

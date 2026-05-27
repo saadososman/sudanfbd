@@ -1,5 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 type ManifestoContent = {
   kicker: string;
@@ -15,9 +15,9 @@ export function ManifestoSection({
 }: {
   locale: Locale;
   compact?: boolean;
-  content?: ManifestoContent;
+  content: ManifestoContent;
 }) {
-  const manifesto = content ?? dictionary[locale].manifesto;
+  const manifesto = content;
 
   return (
     <section className={`section manifesto-section ${compact ? "manifesto-compact" : ""}`}>
