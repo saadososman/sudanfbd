@@ -3,8 +3,21 @@ import { dictionary, type Locale } from "@/lib/i18n";
 
 const icons = [FileCheck2, Network, Scale, Blocks];
 
-export function ObjectivesSection({ locale }: { locale: Locale }) {
-  const objectives = dictionary[locale].objectives;
+type ObjectivesContent = {
+  kicker: string;
+  title: string;
+  paragraphs: string[];
+  cards: Array<{ title: string; text: string }>;
+};
+
+export function ObjectivesSection({
+  locale,
+  content
+}: {
+  locale: Locale;
+  content?: ObjectivesContent;
+}) {
+  const objectives = content ?? dictionary[locale].objectives;
 
   return (
     <section className="section objectives-section">
@@ -20,7 +33,11 @@ export function ObjectivesSection({ locale }: { locale: Locale }) {
           {objectives.cards.map((card, index) => {
             const Icon = icons[index] || ArrowUpRight;
             return (
-              <article className="objective-card reveal" style={{ animationDelay: `${index * 90}ms` }} key={card.title}>
+              <article
+                className="objective-card reveal"
+                style={{ animationDelay: `${index * 90}ms` }}
+                key={card.title}
+              >
                 <span className="objective-icon">
                   <Icon size={23} />
                 </span>

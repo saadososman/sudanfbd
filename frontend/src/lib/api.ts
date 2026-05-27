@@ -86,22 +86,7 @@ function mapDocumentItem(item: Record<string, unknown>): DocumentItem | null {
   };
 }
 
-async function findSectorIdBySlug(slug: string) {
-  if (!slug) return null;
-
-  const res = await fetch(
-    `${STRAPI_URL}/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&pagination[pageSize]=1`,
-    { cache: "no-store" }
-  );
-
-  if (!res.ok) return null;
-
-  const payload = await res.json();
-  const item = payload.data?.[0] as Record<string, unknown> | undefined;
-  if (!item) return null;
-
-  return item.documentId ?? item.id ?? null;
-}
+import { fetchSectorIdBySlug } from "@/lib/cms/sectors";
 
 export async function fetchDocuments(): Promise<DocumentItem[]> {
   try {
@@ -148,7 +133,7 @@ export async function uploadDocument(formData: FormData) {
 
   if (!fileId) throw new Error("Upload failed");
 
-  const sectorId = await findSectorIdBySlug(sectorSlug);
+  const sectorId = await fetchSectorIdBySlug(sectorSlug);
   const data: Record<string, unknown> = {
     title,
     file: fileId

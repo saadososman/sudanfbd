@@ -1,18 +1,15 @@
-import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
+import type { CmsSiteConfig } from "@/lib/cms/types";
 
-export function Footer({ locale }: { locale: Locale }) {
-  const t = dictionary[locale];
-
+export function Footer({ siteConfig }: { siteConfig: CmsSiteConfig }) {
   return (
     <footer className="footer">
       <div className="container footer-grid">
         <div>
-          <h2>{t.brand}</h2>
-          <p>{t.hero.body}</p>
+          <h2>{siteConfig.siteName}</h2>
+          <p>{siteConfig.footerTagline}</p>
         </div>
         <div>
-          <p>{locale === "ar" ? "ألوان مستوحاة من علم السودان وهوية البناء المؤسسي." : "Colors inspired by Sudan's flag and institutional development identity."}</p>
+          <p>{siteConfig.footerNote}</p>
         </div>
       </div>
     </footer>

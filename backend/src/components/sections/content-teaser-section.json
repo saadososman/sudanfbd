@@ -1,0 +1,35 @@
+{
+  "collectionName": "components_sections_content_teaser_sections",
+  "info": {
+    "displayName": "Content Teaser Section",
+    "icon": "grid"
+  },
+  "options": {},
+  "attributes": {
+    "kicker": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "contentType": {
+      "type": "enumeration",
+      "enum": ["news", "sectors", "documents"],
+      "required": true
+    },
+    "limit": {
+      "type": "integer",
+      "default": 3
+    },
+    "viewAllLabel": {
+      "type": "string"
+    },
+    "viewAllPath": {
+      "type": "string"
+    }
+  }
+}

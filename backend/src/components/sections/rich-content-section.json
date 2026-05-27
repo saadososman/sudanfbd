@@ -1,0 +1,40 @@
+{
+  "collectionName": "components_sections_rich_content_sections",
+  "info": {
+    "displayName": "Rich Content Section",
+    "icon": "file"
+  },
+  "options": {},
+  "attributes": {
+    "kicker": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "intro": {
+      "type": "text"
+    },
+    "body": {
+      "type": "blocks"
+    },
+    "paragraphs": {
+      "type": "json"
+    },
+    "bulletPoints": {
+      "type": "json"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-card"
+    },
+    "items": {
+      "type": "json"
+    },
+    "phases": {
+      "type": "json"
+    }
+  }
+}

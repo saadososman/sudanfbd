@@ -15,6 +15,7 @@ export type ArticleItem = {
   title: string;
   excerpt: string;
   content: StrapiBlock[];
+  coverImageUrl?: string;
   publishedAt?: string;
 };
 
@@ -24,6 +25,31 @@ function getItemFields(item: Record<string, unknown>) {
     return attributes as Record<string, unknown>;
   }
   return item;
+}
+
+function getRelatedEntity(relation: unknown) {
+  if (!relation || typeof relation !== "object") return null;
+
+  const relationRecord = relation as Record<string, unknown>;
+  const data = relationRecord.data ?? relation;
+
+  if (Array.isArray(data)) {
+    return (data[0] as Record<string, unknown> | undefined) ?? null;
+  }
+
+  return data as Record<string, unknown>;
+}
+
+function getMediaUrl(media: unknown) {
+  if (!media || typeof media !== "object") return "";
+
+  const mediaRecord = media as Record<string, unknown>;
+  const entity = getRelatedEntity(mediaRecord) ?? mediaRecord;
+  const fields = getItemFields(entity);
+  const url = fields.url;
+
+  if (typeof url !== "string" || !url) return "";
+  return url.startsWith("http") ? url : `${STRAPI_URL}${url}`;
 }
 
 function getArticleId(item: Record<string, unknown>) {
@@ -69,18 +95,42 @@ function mapArticleItem(item: Record<string, unknown>): ArticleItem | null {
     title: typeof title === "string" && title ? title : "Untitled",
     excerpt: excerpt.length > 180 ? `${excerpt.slice(0, 177)}...` : excerpt,
     content,
+    coverImageUrl: getMediaUrl(fields.coverImage) || undefined,
     publishedAt:
       typeof fields.publishedAt === "string" ? fields.publishedAt : undefined
   };
 }
 
+const articlesQuery = "sort=publishedAt:desc&populate[coverImage]=*";
+
 export async function fetchArticles(): Promise<ArticleItem[]> {
   if (!STRAPI_URL) return [];
 
   try {
-    const res = await fetch(`${STRAPI_URL}/api/articles?sort=publishedAt:desc`, {
+    const res = await fetch(`${STRAPI_URL}/api/articles?${articlesQuery}`, {
       next: { revalidate: 60 }
     });
+
+    if (!res.ok) return [];
+
+    const payload = await res.json();
+
+    return (payload.data ?? [])
+      .map((item: Record<string, unknown>) => mapArticleItem(item))
+      .filter((item: ArticleItem | null): item is ArticleItem => item !== null);
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchLatestArticles(limit = 3): Promise<ArticleItem[]> {
+  if (!STRAPI_URL) return [];
+
+  try {
+    const res = await fetch(
+      `${STRAPI_URL}/api/articles?${articlesQuery}&pagination[pageSize]=${limit}`,
+      { next: { revalidate: 60 } }
+    );
 
     if (!res.ok) return [];
 
@@ -98,9 +148,10 @@ export async function fetchArticle(id: string): Promise<ArticleItem | null> {
   if (!STRAPI_URL || !id) return null;
 
   try {
-    const res = await fetch(`${STRAPI_URL}/api/articles/${encodeURIComponent(id)}`, {
-      next: { revalidate: 60 }
-    });
+    const res = await fetch(
+      `${STRAPI_URL}/api/articles/${encodeURIComponent(id)}?populate[coverImage]=*`,
+      { next: { revalidate: 60 } }
+    );
 
     if (!res.ok) return null;
 

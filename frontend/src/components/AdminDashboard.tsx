@@ -2,12 +2,18 @@
 
 import { FormEvent, useState } from "react";
 import { UploadCloud } from "lucide-react";
+import type { CmsSector } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 import { dictionary } from "@/lib/i18n";
-import { sectors, sectorText } from "@/lib/sectors";
 import { uploadDocument } from "@/lib/api";
 
-export function AdminDashboard({ locale }: { locale: Locale }) {
+export function AdminDashboard({
+  locale,
+  sectors
+}: {
+  locale: Locale;
+  sectors: CmsSector[];
+}) {
   const t = dictionary[locale];
   const [status, setStatus] = useState<string>(t.statusReady);
   const [pending, setPending] = useState(false);
@@ -37,10 +43,10 @@ export function AdminDashboard({ locale }: { locale: Locale }) {
         </label>
         <label>
           {t.sector}
-          <select className="input" name="sector" defaultValue={sectors[0].slug}>
+          <select className="input" name="sector" defaultValue={sectors[0]?.slug}>
             {sectors.map((sector) => (
               <option value={sector.slug} key={sector.slug}>
-                {sectorText(sector, locale).title}
+                {sector.title}
               </option>
             ))}
           </select>
@@ -65,8 +71,8 @@ export function AdminDashboard({ locale }: { locale: Locale }) {
         <h2>{locale === "ar" ? "تكامل Strapi" : "Strapi Integration"}</h2>
         <p>
           {locale === "ar"
-            ? "تعتمد لوحة الإدارة على /api/upload لرفع ملفات PDF ثم /api/documents لحفظ بيانات الوثيقة."
-            : "The admin dashboard uses /api/upload for PDF files, then /api/documents to store document metadata."}
+            ? "تعتمد لوحة الإدارة على /api/upload لرفع ملفات PDF ثم /api/forum-documents لحفظ بيانات الوثيقة."
+            : "The admin dashboard uses /api/upload for PDF files, then /api/forum-documents to store document metadata."}
         </p>
       </div>
     </div>

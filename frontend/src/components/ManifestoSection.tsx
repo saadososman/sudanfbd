@@ -1,8 +1,23 @@
 import { CheckCircle2 } from "lucide-react";
 import { dictionary, type Locale } from "@/lib/i18n";
 
-export function ManifestoSection({ locale, compact = false }: { locale: Locale; compact?: boolean }) {
-  const manifesto = dictionary[locale].manifesto;
+type ManifestoContent = {
+  kicker: string;
+  title: string;
+  paragraphs: string[];
+  points: string[];
+};
+
+export function ManifestoSection({
+  locale,
+  compact = false,
+  content
+}: {
+  locale: Locale;
+  compact?: boolean;
+  content?: ManifestoContent;
+}) {
+  const manifesto = content ?? dictionary[locale].manifesto;
 
   return (
     <section className={`section manifesto-section ${compact ? "manifesto-compact" : ""}`}>

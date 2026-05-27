@@ -62,6 +62,12 @@ export default async function NewsArticlePage({
       <section className="section">
         <div className="container article-page-layout">
           <article className="panel article-detail reveal">
+            {article.coverImageUrl ? (
+              <div className="article-cover">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={article.coverImageUrl} alt="" />
+              </div>
+            ) : null}
             <ArticleContent content={article.content} />
           </article>
           <Link className="button light article-back-link" href={`/${locale}/news`}>

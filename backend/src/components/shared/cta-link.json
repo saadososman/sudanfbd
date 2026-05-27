@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_shared_cta_links",
+  "info": {
+    "displayName": "CTA Link",
+    "icon": "cursor"
+  },
+  "options": {},
+  "attributes": {
+    "label": {
+      "type": "string",
+      "required": true
+    },
+    "path": {
+      "type": "string",
+      "required": true
+    },
+    "variant": {
+      "type": "enumeration",
+      "enum": ["primary", "secondary", "light"],
+      "default": "primary"
+    },
+    "icon": {
+      "type": "string"
+    }
+  }
+}

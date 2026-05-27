@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { PageTitle } from "@/components/PageTitle";
 import { SectorDirectory } from "@/components/SectorDirectory";
+import { fetchSectors } from "@/lib/cms";
 import { dictionary, type Locale } from "@/lib/i18n";
-import { getSectors } from "@/lib/strapi";
 
 export async function generateMetadata({
-  params,
+  params
 }: {
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
@@ -14,19 +14,18 @@ export async function generateMetadata({
 
   return {
     title: `${t.sectorsTitle} | ${t.brand}`,
-    description: t.sectorsIntro,
+    description: t.sectorsIntro
   };
 }
 
 export default async function SectorsPage({
-  params,
+  params
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
   const t = dictionary[locale];
-
-  const sectors = await getSectors(locale);
+  const sectors = await fetchSectors(locale);
 
   const heroIntro =
     locale === "ar"

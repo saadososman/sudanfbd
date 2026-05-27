@@ -3,12 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import type { CmsSector } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
-import type { Sector } from "@/lib/strapi";
 
 type Props = {
   locale: Locale;
-  sectors: Sector[];
+  sectors: CmsSector[];
 };
 
 export function SectorDirectory({ locale, sectors }: Props) {
@@ -25,7 +25,7 @@ export function SectorDirectory({ locale, sectors }: Props) {
       return (
         sector.title.toLowerCase().includes(normalized) ||
         sector.summary.toLowerCase().includes(normalized) ||
-        sector.category.toLowerCase().includes(normalized)
+        sector.categoryLabel.toLowerCase().includes(normalized)
       );
     });
   }, [query, sectors]);
@@ -53,7 +53,7 @@ export function SectorDirectory({ locale, sectors }: Props) {
         <div className="sector-grid">
           {filteredSectors.map((sector) => (
             <article className="sector-card reveal" key={sector.id}>
-              <span className="sector-category">{sector.category}</span>
+              <span className="sector-category">{sector.categoryLabel}</span>
 
               <h2>{sector.title}</h2>
 

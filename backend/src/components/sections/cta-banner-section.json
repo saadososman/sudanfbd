@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_cta_banner_sections",
+  "info": {
+    "displayName": "CTA Banner Section",
+    "icon": "bell"
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "body": {
+      "type": "text"
+    },
+    "cta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.cta-link"
+    }
+  }
+}
