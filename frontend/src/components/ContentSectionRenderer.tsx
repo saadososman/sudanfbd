@@ -486,7 +486,7 @@ export async function ContentSectionRenderer({
   }, 3);
 
   const sectors = needsSectors ? await fetchSectors(locale) : [];
-  const articles = needsNews ? await fetchLatestArticles(newsLimit) : [];
+  const articles = needsNews ? await fetchLatestArticles(locale, newsLimit) : [];
 
   return sections.map((section, index) =>
     renderContentSection(locale, section, index, {

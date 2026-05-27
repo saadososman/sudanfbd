@@ -34,3 +34,11 @@ export function getSiteUrl() {
 
   return LOCAL_SITE_URL;
 }
+
+export function getStrapiApiToken() {
+  return process.env.STRAPI_API_TOKEN?.trim() ?? "";
+}
+
+export function isAdminUploadEnabled() {
+  return Boolean(getStrapiApiToken() && getStrapiUrl());
+}

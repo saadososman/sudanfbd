@@ -6,6 +6,7 @@ import {
   unwrapSingleType
 } from "@/lib/cms/client";
 import { getFallbackSiteConfig } from "@/lib/cms/fallbacks";
+import { mergeSiteConfigWithCms } from "@/lib/cms/site-config-merge";
 import type { CmsSiteConfig } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -30,29 +31,16 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   const fields = unwrapSingleType<SiteConfigPayload>(payload);
   if (!fields) return fallback;
 
-  const siteName = typeof fields.siteName === "string" ? fields.siteName : fallback.siteName;
-  const navigation = mapNavItems(fields.navigation);
-
-  return {
-    siteName,
-    shortName:
-      typeof fields.shortName === "string" && fields.shortName
-        ? fields.shortName
-        : siteName,
+  return mergeSiteConfigWithCms(fallback, {
+    siteName: typeof fields.siteName === "string" ? fields.siteName : undefined,
+    shortName: typeof fields.shortName === "string" ? fields.shortName : undefined,
     brandSubtitle:
-      typeof fields.brandSubtitle === "string" && fields.brandSubtitle
-        ? fields.brandSubtitle
-        : fallback.brandSubtitle,
+      typeof fields.brandSubtitle === "string" ? fields.brandSubtitle : undefined,
     footerTagline:
-      typeof fields.footerTagline === "string" && fields.footerTagline
-        ? fields.footerTagline
-        : fallback.footerTagline,
-    footerNote:
-      typeof fields.footerNote === "string" && fields.footerNote
-        ? fields.footerNote
-        : fallback.footerNote,
+      typeof fields.footerTagline === "string" ? fields.footerTagline : undefined,
+    footerNote: typeof fields.footerNote === "string" ? fields.footerNote : undefined,
     logoUrl: getMediaUrl(fields.logo) || undefined,
-    navigation: navigation.length ? navigation : fallback.navigation,
-    defaultSeo: mapSeo(fields) ?? fallback.defaultSeo
-  };
+    navigation: mapNavItems(fields.navigation),
+    defaultSeo: mapSeo(fields)
+  });
 }

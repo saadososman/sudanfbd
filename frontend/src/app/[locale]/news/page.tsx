@@ -25,7 +25,7 @@ export default async function NewsPage({
 }) {
   const { locale } = await params;
   const t = dictionary[locale];
-  const articles = await fetchArticles();
+  const articles = await fetchArticles(locale);
 
   return (
     <>

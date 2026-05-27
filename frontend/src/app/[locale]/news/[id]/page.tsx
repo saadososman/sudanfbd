@@ -8,12 +8,15 @@ import { fetchArticle, fetchArticles, formatArticleDate } from "@/lib/articles";
 import { dictionary, type Locale } from "@/lib/i18n";
 
 export async function generateStaticParams() {
-  const articles = await fetchArticles();
-
-  return articles.flatMap((article) => [
-    { locale: "ar", id: article.id },
-    { locale: "en", id: article.id }
+  const [arArticles, enArticles] = await Promise.all([
+    fetchArticles("ar"),
+    fetchArticles("en")
   ]);
+
+  return [
+    ...arArticles.map((article) => ({ locale: "ar", id: article.id })),
+    ...enArticles.map((article) => ({ locale: "en", id: article.id }))
+  ];
 }
 
 export async function generateMetadata({
@@ -22,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale; id: string }>;
 }): Promise<Metadata> {
   const { locale, id } = await params;
-  const article = await fetchArticle(id);
+  const article = await fetchArticle(locale, id);
   const t = dictionary[locale];
 
   if (!article) {
@@ -42,7 +45,7 @@ export default async function NewsArticlePage({
 }) {
   const { locale, id } = await params;
   const t = dictionary[locale];
-  const article = await fetchArticle(id);
+  const article = await fetchArticle(locale, id);
 
   if (!article) {
     notFound();

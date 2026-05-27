@@ -13,7 +13,10 @@ type StrapiFetchOptions = {
   locale: Locale;
   revalidate?: number | false;
   tags?: string[];
+  timeoutMs?: number;
 };
+
+const DEFAULT_FETCH_TIMEOUT_MS = 8000;
 
 function getItemFields(item: Record<string, unknown>) {
   const attributes = item.attributes;
@@ -54,7 +57,12 @@ export function parseJsonArray<T>(value: unknown): T[] {
 
 export async function strapiFetch<T>(
   path: string,
-  { locale, revalidate = 60, tags = [] }: StrapiFetchOptions
+  {
+    locale,
+    revalidate = 60,
+    tags = [],
+    timeoutMs = DEFAULT_FETCH_TIMEOUT_MS
+  }: StrapiFetchOptions
 ): Promise<T | null> {
   if (!STRAPI_URL) return null;
 
@@ -63,6 +71,7 @@ export async function strapiFetch<T>(
 
   try {
     const res = await fetch(url, {
+      signal: AbortSignal.timeout(timeoutMs),
       next: {
         revalidate: revalidate === false ? 0 : revalidate,
         tags: tags.length ? tags : undefined

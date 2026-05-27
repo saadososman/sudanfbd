@@ -1,72 +1,24 @@
 import type { CmsHeroSection, CmsHomepage, CmsHomeSection, CmsStatsSection } from "@/lib/cms/types";
+import {
+  isValidHeroSection,
+  mergeHeroSection,
+  mergeStatsSection
+} from "@/lib/cms/hero-stats-merge";
+import {
+  findContentTeaserSection,
+  findSectionByComponent,
+  hasCompleteSections,
+  mergeAboutSection,
+  mergeContentSection,
+  mergeObjectivesSection
+} from "@/lib/cms/section-merge";
 
-function findSection<T extends CmsHomeSection["__component"]>(
-  sections: CmsHomeSection[],
-  component: T
-) {
-  return sections.find(
-    (section): section is Extract<CmsHomeSection, { __component: T }> =>
-      section.__component === component
-  );
-}
+export { mergeHeroSection, mergeStatsSection } from "@/lib/cms/hero-stats-merge";
 
-function isValidHeroSection(section: CmsHeroSection | undefined): section is CmsHeroSection {
-  return Boolean(section?.title?.trim());
-}
-
-function isValidStatsSection(section: CmsStatsSection | undefined): section is CmsStatsSection {
+function isValidStatsSectionLocal(section: CmsStatsSection | undefined): section is CmsStatsSection {
   return Boolean(
     section?.stats.length &&
       section.stats.every((stat) => stat.value.trim() && stat.label.trim())
-  );
-}
-
-export function mergeHeroSection(
-  cmsHero: CmsHeroSection | undefined,
-  fallbackHero: CmsHeroSection
-): CmsHeroSection {
-  if (!isValidHeroSection(cmsHero)) return fallbackHero;
-
-  return {
-    ...fallbackHero,
-    ...cmsHero,
-    title: cmsHero.title,
-    eyebrow: cmsHero.eyebrow ?? fallbackHero.eyebrow,
-    body: cmsHero.body ?? fallbackHero.body,
-    primaryCta: cmsHero.primaryCta ?? fallbackHero.primaryCta,
-    secondaryCta: cmsHero.secondaryCta ?? fallbackHero.secondaryCta,
-    insightOne: cmsHero.insightOne ?? fallbackHero.insightOne,
-    insightTwo: cmsHero.insightTwo ?? fallbackHero.insightTwo,
-    imageUrl: cmsHero.imageUrl ?? fallbackHero.imageUrl
-  };
-}
-
-export function mergeStatsSection(
-  cmsStats: CmsStatsSection | undefined,
-  fallbackStats: CmsStatsSection
-): CmsStatsSection {
-  if (!isValidStatsSection(cmsStats)) return fallbackStats;
-
-  return {
-    __component: "sections.stats-section",
-    stats: cmsStats.stats
-  };
-}
-
-function hasCompleteCmsHomepage(cmsSections: CmsHomeSection[], expectedCount: number) {
-  if (cmsSections.length < expectedCount) return false;
-
-  const required: CmsHomeSection["__component"][] = [
-    "sections.hero-section",
-    "sections.stats-section",
-    "sections.about-section",
-    "sections.objectives-section",
-    "sections.content-teaser-section",
-    "sections.cta-banner-section"
-  ];
-
-  return required.every((component) =>
-    cmsSections.some((section) => section.__component === component)
   );
 }
 
@@ -76,39 +28,59 @@ export function mergeHomepageWithCms(
 ): CmsHomepage {
   if (!cmsSections.length) return fallback;
 
-  if (hasCompleteCmsHomepage(cmsSections, fallback.sections.length)) {
+  if (hasCompleteSections(fallback.sections, cmsSections)) {
     return {
       ...fallback,
-      sections: cmsSections
+      sections: cmsSections as CmsHomeSection[]
     };
   }
 
-  const fallbackHero = findSection(fallback.sections, "sections.hero-section");
-  const fallbackStats = findSection(fallback.sections, "sections.stats-section");
-  const cmsHero = findSection(cmsSections, "sections.hero-section");
-  const cmsStats = findSection(cmsSections, "sections.stats-section");
-
-  const mergedHero = fallbackHero
-    ? mergeHeroSection(cmsHero, fallbackHero)
-    : cmsHero;
-  const mergedStats = fallbackStats
-    ? mergeStatsSection(cmsStats, fallbackStats)
-    : cmsStats;
+  const cmsHero = findSectionByComponent(cmsSections, "sections.hero-section");
+  const cmsStats = findSectionByComponent(cmsSections, "sections.stats-section");
+  const fallbackHero = findSectionByComponent(fallback.sections, "sections.hero-section");
+  const fallbackStats = findSectionByComponent(fallback.sections, "sections.stats-section");
 
   const sections = fallback.sections.map((section) => {
-    if (section.__component === "sections.hero-section" && mergedHero) {
-      return mergedHero;
+    if (section.__component === "sections.hero-section") {
+      return fallbackHero
+        ? mergeHeroSection(cmsHero, fallbackHero)
+        : section;
     }
 
-    if (section.__component === "sections.stats-section" && mergedStats) {
-      return mergedStats;
+    if (section.__component === "sections.stats-section") {
+      return fallbackStats ? mergeStatsSection(cmsStats, fallbackStats) : section;
     }
 
-    const cmsMatch = cmsSections.find(
-      (candidate) => candidate.__component === section.__component
-    );
+    if (section.__component === "sections.about-section") {
+      return mergeAboutSection(
+        findSectionByComponent(cmsSections, "sections.about-section"),
+        section
+      );
+    }
 
-    return cmsMatch ?? section;
+    if (section.__component === "sections.objectives-section") {
+      return mergeObjectivesSection(
+        findSectionByComponent(cmsSections, "sections.objectives-section"),
+        section
+      );
+    }
+
+    if (section.__component === "sections.content-teaser-section") {
+      return mergeContentSection(
+        findContentTeaserSection(cmsSections, section.contentType),
+        section
+      );
+    }
+
+    if (section.__component === "sections.cta-banner-section") {
+      return mergeContentSection(
+        findSectionByComponent(cmsSections, "sections.cta-banner-section"),
+        section
+      );
+    }
+
+    const cmsMatch = findSectionByComponent(cmsSections, section.__component);
+    return cmsMatch ? mergeContentSection(cmsMatch, section) : section;
   });
 
   return {
@@ -121,7 +93,7 @@ export function isHeroFromCms(
   cmsSections: CmsHomeSection[],
   mergedHero: CmsHeroSection | undefined
 ) {
-  const cmsHero = findSection(cmsSections, "sections.hero-section");
+  const cmsHero = findSectionByComponent(cmsSections, "sections.hero-section");
   return isValidHeroSection(cmsHero) && mergedHero === cmsHero;
 }
 
@@ -129,6 +101,6 @@ export function isStatsFromCms(
   cmsSections: CmsHomeSection[],
   mergedStats: CmsStatsSection | undefined
 ) {
-  const cmsStats = findSection(cmsSections, "sections.stats-section");
-  return isValidStatsSection(cmsStats) && mergedStats === cmsStats;
+  const cmsStats = findSectionByComponent(cmsSections, "sections.stats-section");
+  return isValidStatsSectionLocal(cmsStats) && mergedStats === cmsStats;
 }

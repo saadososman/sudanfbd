@@ -175,10 +175,10 @@ export async function fetchSectorSlugs(): Promise<string[]> {
   return fallbackSectors.map((sector) => sector.slug);
 }
 
-export async function fetchSectorIdBySlug(slug: string) {
+export async function fetchSectorIdBySlug(slug: string, locale: Locale = "en") {
   const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&pagination[pageSize]=1`,
-    { locale: "en", revalidate: 60 }
+    { locale, revalidate: 60 }
   );
 
   const item = (payload?.data ?? [])[0] as Record<string, unknown> | undefined;

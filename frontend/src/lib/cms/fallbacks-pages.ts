@@ -1,76 +1,30 @@
+import {
+  getFallbackAboutSection,
+  getFallbackFrameworkSection,
+  getFallbackMethodologySection,
+  getFallbackMissionValuesSection,
+  getFallbackObjectivesSection
+} from "@/lib/cms/fallbacks-content-sections";
 import type { CmsPage, CmsPageSection } from "@/lib/cms/types";
 import { dictionary, type Locale } from "@/lib/i18n";
 
 export const STATIC_PAGE_SLUGS = ["about", "objectives", "methodology", "framework"] as const;
 export type StaticPageSlug = (typeof STATIC_PAGE_SLUGS)[number];
 
-function getObjectivesSection(locale: Locale): CmsPageSection {
-  const objectives = dictionary[locale].objectives;
-
-  return {
-    __component: "sections.objectives-section",
-    kicker: objectives.kicker,
-    title: objectives.title,
-    paragraphs: [...objectives.paragraphs],
-    cards: objectives.cards.map((card, index) => ({
-      title: card.title,
-      text: card.text,
-      order: index
-    }))
-  };
-}
-
 function getAboutSections(locale: Locale): CmsPageSection[] {
-  const t = dictionary[locale];
-  const isArabic = locale === "ar";
-
   return [
-    {
-      __component: "sections.about-section",
-      kicker: t.manifesto.kicker,
-      title: t.manifesto.title,
-      paragraphs: [...t.manifesto.paragraphs],
-      bulletPoints: [...t.manifesto.points],
-      compact: true
-    },
-    getObjectivesSection(locale),
-    {
-      __component: "sections.mission-values-section",
-      missionTitle: t.about.mission,
-      missionText: t.about.missionText,
-      valuesTitle: isArabic ? "مبادئ العمل" : "Operating Principles",
-      values: [...t.about.values]
-    }
+    getFallbackAboutSection(locale, true),
+    getFallbackObjectivesSection(locale),
+    getFallbackMissionValuesSection(locale)
   ];
 }
 
 function getMethodologySections(locale: Locale): CmsPageSection[] {
-  const methodology = dictionary[locale].methodology;
-
-  return [
-    {
-      __component: "sections.methodology-section",
-      cards: methodology.cards.map((card, index) => ({
-        title: card.title,
-        text: card.text,
-        order: index
-      })),
-      phasesTitle: methodology.phasesTitle,
-      phases: [...methodology.phases]
-    }
-  ];
+  return [getFallbackMethodologySection(locale)];
 }
 
 function getFrameworkSections(locale: Locale): CmsPageSection[] {
-  const framework = dictionary[locale].framework;
-
-  return [
-    {
-      __component: "sections.framework-section",
-      title: framework.title,
-      items: [...framework.items]
-    }
-  ];
+  return [getFallbackFrameworkSection(locale)];
 }
 
 export function getFallbackPage(slug: StaticPageSlug, locale: Locale): CmsPage {
@@ -97,7 +51,7 @@ export function getFallbackPage(slug: StaticPageSlug, locale: Locale): CmsPage {
           metaTitle: `${t.objectives.title} | ${t.brand}`,
           metaDescription: t.objectives.paragraphs[0]
         },
-        sections: [getObjectivesSection(locale)]
+        sections: [getFallbackObjectivesSection(locale)]
       };
     case "methodology":
       return {

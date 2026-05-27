@@ -1,4 +1,8 @@
 import { getFallbackHeroSection, getFallbackStatsSection } from "@/lib/cms/fallbacks-hero-stats";
+import {
+  getFallbackAboutSection,
+  getFallbackObjectivesSection
+} from "@/lib/cms/fallbacks-content-sections";
 import type { Locale } from "@/lib/i18n";
 import { dictionary } from "@/lib/i18n";
 import type { CmsHomepage, CmsHomeSection } from "@/lib/cms/types";
@@ -15,24 +19,8 @@ export function getFallbackHomepage(locale: Locale): CmsHomepage {
     sections: [
       getFallbackHeroSection(locale),
       getFallbackStatsSection(locale),
-      {
-        __component: "sections.about-section",
-        kicker: t.manifesto.kicker,
-        title: t.manifesto.title,
-        paragraphs: [...t.manifesto.paragraphs],
-        bulletPoints: [...t.manifesto.points]
-      },
-      {
-        __component: "sections.objectives-section",
-        kicker: t.objectives.kicker,
-        title: t.objectives.title,
-        paragraphs: [...t.objectives.paragraphs],
-        cards: t.objectives.cards.map((card, index) => ({
-          title: card.title,
-          text: card.text,
-          order: index
-        }))
-      },
+      getFallbackAboutSection(locale),
+      getFallbackObjectivesSection(locale),
       {
         __component: "sections.content-teaser-section",
         kicker: isArabic ? "محاور العمل" : "Workstreams",

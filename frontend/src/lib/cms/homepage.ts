@@ -19,6 +19,7 @@ const homepagePopulate =
   "&populate[sections][on][sections.hero-section][populate][secondaryCta]=*" +
   "&populate[sections][on][sections.hero-section][populate][image]=*" +
   "&populate[sections][on][sections.stats-section][populate][stats]=*" +
+  "&populate[sections][on][sections.about-section][populate]=*" +
   "&populate[sections][on][sections.objectives-section][populate][cards]=*" +
   "&populate[sections][on][sections.content-teaser-section][populate]=*" +
   "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
