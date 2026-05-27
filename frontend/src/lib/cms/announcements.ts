@@ -1,4 +1,4 @@
-import { strapiFetch, unwrapCollectionItems } from "@/lib/cms/client";
+import { logStrapiFetch, strapiFetch, unwrapCollectionItems } from "@/lib/cms/client";
 import type { CmsAnnouncement } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -61,15 +61,16 @@ function mapAnnouncementItem(item: Record<string, unknown>): CmsAnnouncement | n
 }
 
 export async function fetchActiveAnnouncements(locale: Locale): Promise<CmsAnnouncement[]> {
-  const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     "/api/announcements?filters[isActive][$eq]=true&sort[0]=priority:desc&sort[1]=createdAt:desc&pagination[pageSize]=5",
-    { locale, revalidate: 120, tags: [`announcements-${locale}`] }
+    { locale }
   );
 
-  if (!payload) return [];
-
-  return unwrapCollectionItems(payload)
+  const announcements = unwrapCollectionItems(payload)
     .map((item) => mapAnnouncementItem(item as Record<string, unknown>))
     .filter((item): item is CmsAnnouncement => item !== null)
     .sort((a, b) => b.priority - a.priority);
+
+  logStrapiFetch("announcements", locale, meta, announcements.length === 0);
+  return announcements;
 }

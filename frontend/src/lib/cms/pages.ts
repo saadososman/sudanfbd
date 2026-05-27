@@ -1,5 +1,6 @@
 import { getFallbackPage } from "@/lib/cms/fallbacks-pages";
 import {
+  logStrapiFetch,
   mapPageSections,
   mapSeo,
   strapiFetch,
@@ -11,7 +12,6 @@ import {
   type ContentPageSlug,
   type PageSlug
 } from "@/lib/cms/constants";
-import { mergePageWithCms } from "@/lib/cms/page-merge";
 import type { CmsPage } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -44,6 +44,20 @@ const pagePopulate =
   "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
   "&populate[seo][populate][ogImage]=*";
 
+function mapCmsPage(fields: PagePayload, slug: PageSlug, fallback: CmsPage): CmsPage {
+  const cmsSections = mapPageSections(fields.sections);
+
+  return {
+    slug,
+    title:
+      typeof fields.title === "string" && fields.title.trim() ? fields.title : fallback.title,
+    intro:
+      typeof fields.intro === "string" && fields.intro.trim() ? fields.intro : fallback.intro,
+    seo: mapSeo(fields as Record<string, unknown>) ?? fallback.seo,
+    sections: cmsSections.length > 0 ? cmsSections : fallback.sections
+  };
+}
+
 export function isStaticPageSlug(slug: string): slug is ContentPageSlug {
   return (CONTENT_PAGE_SLUGS as readonly string[]).includes(slug);
 }
@@ -58,38 +72,20 @@ export async function fetchPageBySlug(
 ): Promise<CmsPage> {
   const fallback = getFallbackPage(slug, locale);
 
-  const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+  const { data: payload, meta } = await strapiFetch<{
+    data?: Record<string, unknown>[] | null;
+  }>(
     `/api/pages?filters[slug][$eq]=${encodeURIComponent(slug)}&${pagePopulate}&pagination[pageSize]=1`,
-    { locale, revalidate: 300, tags: [`page-${slug}-${locale}`] }
+    { locale }
   );
 
   const items = unwrapCollectionItems(payload);
-  if (!items.length) return fallback;
-
-  const fields = items[0] as PagePayload;
-
-  if (isStaticPageSlug(slug)) {
-    const cmsSections = mapPageSections(fields.sections);
-    const merged = mergePageWithCms(fallback, cmsSections);
-
-    return {
-      slug,
-      title:
-        typeof fields.title === "string" && fields.title.trim() ? fields.title : merged.title,
-      intro:
-        typeof fields.intro === "string" && fields.intro.trim() ? fields.intro : merged.intro,
-      seo: mapSeo(fields as Record<string, unknown>) ?? merged.seo,
-      sections: merged.sections
-    };
+  if (!items.length) {
+    logStrapiFetch(`page:${slug}`, locale, meta, true);
+    return fallback;
   }
 
-  return {
-    slug,
-    title:
-      typeof fields.title === "string" && fields.title.trim() ? fields.title : fallback.title,
-    intro:
-      typeof fields.intro === "string" && fields.intro.trim() ? fields.intro : fallback.intro,
-    seo: mapSeo(fields as Record<string, unknown>) ?? fallback.seo,
-    sections: mapPageSections(fields.sections)
-  };
+  const page = mapCmsPage(items[0] as PagePayload, slug, fallback);
+  logStrapiFetch(`page:${slug}`, locale, meta, false);
+  return page;
 }

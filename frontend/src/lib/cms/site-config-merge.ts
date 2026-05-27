@@ -25,47 +25,33 @@ function mergeUiLabels(cmsLabels: CmsUiLabels, fallbackLabels: CmsUiLabels): Cms
   return merged;
 }
 
+function resolveNavLabel(cmsItem: CmsNavItem, fallbackNavigation: CmsNavItem[]) {
+  if (cmsItem.label?.trim()) return cmsItem.label;
+  return fallbackNavigation.find((item) => item.path === cmsItem.path)?.label ?? cmsItem.label;
+}
+
 export function mergeNavigation(
   cmsNavigation: CmsNavItem[],
   fallbackNavigation: CmsNavItem[]
 ): CmsNavItem[] {
   if (!cmsNavigation.length) return fallbackNavigation;
 
-  const mergedFallback = fallbackNavigation.map((fallbackItem) => {
-    const cmsItem = cmsNavigation.find((item) => item.path === fallbackItem.path);
-    if (!cmsItem) return fallbackItem;
-
-    return {
-      ...fallbackItem,
+  return cmsNavigation
+    .map((cmsItem) => ({
       ...cmsItem,
-      label: cmsItem.label?.trim() ? cmsItem.label : fallbackItem.label,
-      path: cmsItem.path?.trim() ? cmsItem.path : fallbackItem.path,
-      order: cmsItem.order ?? fallbackItem.order,
-      isVisible: cmsItem.isVisible ?? fallbackItem.isVisible,
-      openInNewTab: cmsItem.openInNewTab ?? fallbackItem.openInNewTab,
-      icon: cmsItem.icon ?? fallbackItem.icon
-    };
-  });
-
-  const extraItems = cmsNavigation.filter(
-    (cmsItem) => !fallbackNavigation.some((fallbackItem) => fallbackItem.path === cmsItem.path)
-  );
-
-  const merged = [...mergedFallback, ...extraItems].sort((a, b) => a.order - b.order);
-
-  if (!merged.some((item) => item.isVisible && item.label.trim())) {
-    return fallbackNavigation;
-  }
-
-  return merged;
+      label: resolveNavLabel(cmsItem, fallbackNavigation),
+      path: cmsItem.path?.trim()
+        ? cmsItem.path
+        : fallbackNavigation.find((item) => item.path === cmsItem.path)?.path ?? cmsItem.path,
+      isVisible: cmsItem.isVisible !== false
+    }))
+    .sort((a, b) => a.order - b.order);
 }
 
-export function mergeSiteConfigWithCms(
+export function buildSiteConfigFromCms(
   fallback: CmsSiteConfig,
-  fields: SiteConfigFields | null
+  fields: SiteConfigFields
 ): CmsSiteConfig {
-  if (!fields) return fallback;
-
   const siteName =
     typeof fields.siteName === "string" && fields.siteName.trim()
       ? fields.siteName
@@ -94,4 +80,13 @@ export function mergeSiteConfigWithCms(
     defaultSeo: fields.defaultSeo ?? fallback.defaultSeo,
     uiLabels: mergeUiLabels(fields.uiLabels ?? fallback.uiLabels, fallback.uiLabels)
   };
+}
+
+/** @deprecated Use buildSiteConfigFromCms */
+export function mergeSiteConfigWithCms(
+  fallback: CmsSiteConfig,
+  fields: SiteConfigFields | null
+): CmsSiteConfig {
+  if (!fields) return fallback;
+  return buildSiteConfigFromCms(fallback, fields);
 }

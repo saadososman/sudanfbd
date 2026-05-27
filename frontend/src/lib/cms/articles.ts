@@ -1,5 +1,6 @@
 import {
   getMediaUrl,
+  logStrapiFetch,
   strapiFetch,
   unwrapCollectionItems
 } from "@/lib/cms/client";
@@ -79,36 +80,39 @@ function mapArticleItem(item: Record<string, unknown>): ArticleItem | null {
   };
 }
 
-const articlesQuery =
-  "sort=publishedAt:desc&populate[coverImage]=*";
+const articlesQuery = "sort=publishedAt:desc&populate[coverImage]=*";
+
+function mapArticlesFromPayload(
+  payload: { data?: Record<string, unknown>[] | null } | null
+) {
+  return unwrapCollectionItems(payload)
+    .map((item) => mapArticleItem(item as Record<string, unknown>))
+    .filter((item): item is ArticleItem => item !== null);
+}
 
 export async function fetchArticles(locale: Locale): Promise<ArticleItem[]> {
-  const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     `/api/articles?${articlesQuery}&pagination[pageSize]=100`,
-    { locale, revalidate: 120, tags: [`articles-${locale}`] }
+    { locale }
   );
 
-  if (!payload?.data?.length) return [];
-
-  return payload.data
-    .map((item) => mapArticleItem(item))
-    .filter((item): item is ArticleItem => item !== null);
+  const articles = mapArticlesFromPayload(payload);
+  logStrapiFetch("articles", locale, meta, articles.length === 0);
+  return articles;
 }
 
 export async function fetchLatestArticles(
   locale: Locale,
   limit = 3
 ): Promise<ArticleItem[]> {
-  const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     `/api/articles?${articlesQuery}&pagination[pageSize]=${limit}`,
-    { locale, revalidate: 120, tags: [`articles-${locale}`] }
+    { locale }
   );
 
-  if (!payload?.data?.length) return [];
-
-  return payload.data
-    .map((item) => mapArticleItem(item))
-    .filter((item): item is ArticleItem => item !== null);
+  const articles = mapArticlesFromPayload(payload);
+  logStrapiFetch(`articles:latest:${limit}`, locale, meta, articles.length === 0);
+  return articles;
 }
 
 export async function fetchArticle(
@@ -117,13 +121,19 @@ export async function fetchArticle(
 ): Promise<ArticleItem | null> {
   if (!id) return null;
 
-  const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
     `/api/articles/${encodeURIComponent(id)}?populate[coverImage]=*`,
-    { locale, revalidate: 120, tags: [`article-${id}-${locale}`] }
+    { locale }
   );
 
-  if (!payload?.data) return null;
-  return mapArticleItem(payload.data);
+  if (!payload?.data) {
+    logStrapiFetch(`article:${id}`, locale, meta, true);
+    return null;
+  }
+
+  const article = mapArticleItem(payload.data as Record<string, unknown>);
+  logStrapiFetch(`article:${id}`, locale, meta, !article);
+  return article;
 }
 
 export function formatArticleDate(value: string | undefined, locale: Locale) {

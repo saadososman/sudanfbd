@@ -1,12 +1,13 @@
 import {
   getMediaUrl,
+  logStrapiFetch,
   mapNavItems,
   mapSeo,
   strapiFetch,
   unwrapSingleType
 } from "@/lib/cms/client";
 import { getFallbackSiteConfig } from "@/lib/cms/fallbacks";
-import { mergeSiteConfigWithCms } from "@/lib/cms/site-config-merge";
+import { buildSiteConfigFromCms } from "@/lib/cms/site-config-merge";
 import type { CmsSiteConfig } from "@/lib/cms/types";
 import { mapUiLabels } from "@/lib/cms/ui-labels";
 import type { Locale } from "@/lib/i18n";
@@ -30,15 +31,30 @@ export function getNavLabel(config: CmsSiteConfig, path: string) {
 export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   const fallback = getFallbackSiteConfig(locale);
 
-  const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
     "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[defaultSeo][populate][ogImage]=*&populate[uiLabels]=*",
-    { locale, revalidate: 300, tags: [`site-config-${locale}`] }
+    { locale }
   );
 
   const fields = unwrapSingleType<SiteConfigPayload>(payload);
-  if (!fields) return fallback;
+  if (!fields) {
+    logStrapiFetch("site-config", locale, meta, true);
+    return fallback;
+  }
 
-  return mergeSiteConfigWithCms(fallback, {
+  const navigation = mapNavItems(fields.navigation);
+  const uiLabels = mapUiLabels(fields.uiLabels);
+  const hasCmsContent = Boolean(
+    (typeof fields.siteName === "string" && fields.siteName.trim()) || navigation.length
+  );
+
+  if (!hasCmsContent) {
+    logStrapiFetch("site-config", locale, meta, true);
+    return fallback;
+  }
+
+  logStrapiFetch("site-config", locale, meta, false);
+  return buildSiteConfigFromCms(fallback, {
     siteName: typeof fields.siteName === "string" ? fields.siteName : undefined,
     shortName: typeof fields.shortName === "string" ? fields.shortName : undefined,
     brandSubtitle:
@@ -47,8 +63,8 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
       typeof fields.footerTagline === "string" ? fields.footerTagline : undefined,
     footerNote: typeof fields.footerNote === "string" ? fields.footerNote : undefined,
     logoUrl: getMediaUrl(fields.logo) || undefined,
-    navigation: mapNavItems(fields.navigation),
+    navigation,
     defaultSeo: mapSeo(fields),
-    uiLabels: mapUiLabels(fields.uiLabels)
+    uiLabels
   });
 }
