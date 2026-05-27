@@ -105,12 +105,18 @@ export type CmsHomepage = {
   sections: CmsHomeSection[];
 };
 
+export type CmsPageSection =
+  | CmsRichContentSection
+  | CmsStatsSection
+  | CmsContentTeaserSection
+  | CmsCtaBannerSection;
+
 export type CmsPage = {
   slug: string;
   title: string;
   intro?: string;
   seo?: CmsSeo;
-  sections: Array<CmsRichContentSection | CmsCtaBannerSection | CmsStatsSection | CmsContentTeaserSection>;
+  sections: CmsPageSection[];
 };
 
 export type CmsAnnouncement = {

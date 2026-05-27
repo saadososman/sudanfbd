@@ -1,6 +1,9 @@
 export { fetchSiteConfig } from "@/lib/cms/site-config";
 export { fetchHomepage } from "@/lib/cms/homepage";
 export { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
+export { fetchPageBySlug, isStaticPageSlug } from "@/lib/cms/pages";
+export { getFallbackPage, STATIC_PAGE_SLUGS } from "@/lib/cms/fallbacks-pages";
+export { buildStaticPageMetadata } from "@/lib/cms/page-metadata";
 export {
   fetchSectorBySlug,
   fetchSectorIdBySlug,
@@ -15,7 +18,9 @@ export type {
   CmsHomeSection,
   CmsNavItem,
   CmsPage,
+  CmsPageSection,
   CmsSector,
   CmsSiteConfig,
   SectorCategory
 } from "@/lib/cms/types";
+export type { StaticPageSlug } from "@/lib/cms/fallbacks-pages";

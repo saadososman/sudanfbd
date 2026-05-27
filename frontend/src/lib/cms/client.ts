@@ -1,5 +1,5 @@
 import { getStrapiUrl } from "@/lib/env";
-import type { CmsHomeSection } from "@/lib/cms/types";
+import type { CmsHomeSection, CmsPageSection } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
 const STRAPI_URL = getStrapiUrl();
@@ -211,6 +211,71 @@ export function mapHomeSections(sections: unknown): CmsHomeSection[] {
           insightTwo: typeof fields.insightTwo === "string" ? fields.insightTwo : undefined
         };
       }
+
+      if (component === "sections.rich-content-section") {
+        return {
+          __component: "sections.rich-content-section" as const,
+          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+          title: typeof fields.title === "string" ? fields.title : "",
+          intro: typeof fields.intro === "string" ? fields.intro : undefined,
+          paragraphs: parseJsonArray<string>(fields.paragraphs),
+          bulletPoints: parseJsonArray<string>(fields.bulletPoints),
+          cards: mapTextCards(fields.cards),
+          items: parseJsonArray<string>(fields.items),
+          phases: parseJsonArray<string>(fields.phases)
+        };
+      }
+
+      if (component === "sections.stats-section") {
+        return {
+          __component: "sections.stats-section" as const,
+          stats: mapStatItems(fields.stats)
+        };
+      }
+
+      if (component === "sections.content-teaser-section") {
+        const contentType = fields.contentType;
+        if (contentType !== "news" && contentType !== "sectors" && contentType !== "documents") {
+          return null;
+        }
+
+        const typedContentType = contentType as "news" | "sectors" | "documents";
+
+        return {
+          __component: "sections.content-teaser-section" as const,
+          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+          title: typeof fields.title === "string" ? fields.title : "",
+          intro: typeof fields.intro === "string" ? fields.intro : undefined,
+          contentType: typedContentType,
+          limit: typeof fields.limit === "number" ? fields.limit : 3,
+          viewAllLabel: typeof fields.viewAllLabel === "string" ? fields.viewAllLabel : undefined,
+          viewAllPath: typeof fields.viewAllPath === "string" ? fields.viewAllPath : undefined
+        };
+      }
+
+      if (component === "sections.cta-banner-section") {
+        return {
+          __component: "sections.cta-banner-section" as const,
+          title: typeof fields.title === "string" ? fields.title : "",
+          body: typeof fields.body === "string" ? fields.body : undefined,
+          cta: mapCtaLink(fields.cta)
+        };
+      }
+
+      return null;
+    })
+    .filter((section): section is NonNullable<typeof section> => section !== null);
+}
+
+export function mapPageSections(sections: unknown): CmsPageSection[] {
+  if (!Array.isArray(sections)) return [];
+
+  return sections
+    .map((section) => {
+      if (!section || typeof section !== "object") return null;
+
+      const fields = getItemFields(section as Record<string, unknown>);
+      const component = fields.__component;
 
       if (component === "sections.rich-content-section") {
         return {
