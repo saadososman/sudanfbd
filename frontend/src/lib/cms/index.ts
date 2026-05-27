@@ -12,8 +12,11 @@ export { uploadDocumentWithToken } from "@/lib/cms/strapi-admin";
 export { fetchSiteConfig, getNavLabel } from "@/lib/cms/site-config";
 export {
   fetchHomepage,
+  fetchHomepageWithSource,
   getNewsListingFromHomepage,
-  getSectorsListingFromHomepage
+  getSectorsListingFromHomepage,
+  type CmsContentSource,
+  type HomepageResult
 } from "@/lib/cms/homepage";
 export {
   fetchPageBySlug,

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
 import {
   logStrapiFetch,
@@ -14,6 +15,14 @@ type HomepagePayload = {
   sections?: unknown;
 };
 
+export type CmsContentSource = "strapi" | "fallback";
+
+export type HomepageResult = {
+  homepage: CmsHomepage;
+  source: CmsContentSource;
+};
+
+// Do not add populate[seo] here — Strapi 5 drops the sections array when SEO is deep-populated.
 const homepagePopulate =
   "populate[sections][on][sections.hero-section][populate][primaryCta]=*" +
   "&populate[sections][on][sections.hero-section][populate][secondaryCta]=*" +
@@ -22,8 +31,7 @@ const homepagePopulate =
   "&populate[sections][on][sections.about-section][populate]=*" +
   "&populate[sections][on][sections.objectives-section][populate][cards]=*" +
   "&populate[sections][on][sections.content-teaser-section][populate]=*" +
-  "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
-  "&populate[seo][populate][ogImage]=*";
+  "&populate[sections][on][sections.cta-banner-section][populate][cta]=*";
 
 export function getSectorsListingFromHomepage(homepage: CmsHomepage) {
   const section = homepage.sections.find(
@@ -51,7 +59,7 @@ export function getNewsListingFromHomepage(homepage: CmsHomepage) {
   };
 }
 
-export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
+export const fetchHomepageWithSource = cache(async (locale: Locale): Promise<HomepageResult> => {
   const fallback = getFallbackHomepage(locale);
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
@@ -62,18 +70,31 @@ export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
   const fields = unwrapSingleType<HomepagePayload>(payload);
   if (!fields) {
     logStrapiFetch("homepage", locale, meta, true);
-    return fallback;
+    return { homepage: fallback, source: "fallback" };
   }
 
+  const rawSectionCount = Array.isArray(fields.sections) ? fields.sections.length : 0;
   const cmsSections = mapHomeSections(fields.sections);
+
   if (!cmsSections.length) {
+    console.warn(
+      `[CMS] homepage locale=${locale} rawSections=${rawSectionCount} mappedSections=0 — using fallback`
+    );
     logStrapiFetch("homepage", locale, meta, true);
-    return fallback;
+    return { homepage: fallback, source: "fallback" };
   }
 
   logStrapiFetch("homepage", locale, meta, false);
   return {
-    seo: mapSeo(fields) ?? fallback.seo,
-    sections: cmsSections
+    homepage: {
+      seo: mapSeo(fields) ?? fallback.seo,
+      sections: cmsSections
+    },
+    source: "strapi"
   };
+});
+
+export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
+  const { homepage } = await fetchHomepageWithSource(locale);
+  return homepage;
 }

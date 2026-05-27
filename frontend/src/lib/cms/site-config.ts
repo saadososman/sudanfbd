@@ -32,7 +32,7 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   const fallback = getFallbackSiteConfig(locale);
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
-    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[defaultSeo][populate][ogImage]=*&populate[uiLabels]=*",
+    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[uiLabels]=*",
     { locale }
   );
 

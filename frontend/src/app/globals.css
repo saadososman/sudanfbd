@@ -1841,3 +1841,17 @@ textarea {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+.cms-source-debug {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font: 600 0.8125rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  text-align: center;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: #b45309;
+}
+
+.cms-source-debug[data-cms-source="strapi"] {
+  background: #047857;
+}
