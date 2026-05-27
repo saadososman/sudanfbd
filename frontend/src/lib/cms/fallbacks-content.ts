@@ -84,10 +84,10 @@ const CONTENT_FALLBACKS: Record<Locale, ContentFallback> = {
       about: "عن الملتقى",
       objectives: "الأهداف",
       sectors: "القطاعات",
-      methodology: "منهجية العمل",
+      methodology: "المنهجية",
       framework: "إطار التخطيط",
       news: "الأخبار",
-      documents: "المكتبة",
+      documents: "الوثائق",
       admin: "الإدارة"
     },
     hero: {
@@ -265,7 +265,7 @@ const CONTENT_FALLBACKS: Record<Locale, ContentFallback> = {
       methodology: "Methodology",
       framework: "Planning Framework",
       news: "News",
-      documents: "Library",
+      documents: "Documents",
       admin: "Admin"
     },
     hero: {
