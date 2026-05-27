@@ -1,4 +1,4 @@
-import { getStrapiUrl } from "@/lib/env";
+import { getStrapiUrl, logStrapiUrl } from "@/lib/env";
 import type {
   CmsContentSection,
   CmsHeroSection,
@@ -7,11 +7,13 @@ import type {
 } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
-const STRAPI_URL = getStrapiUrl();
+const STRAPI_URL = logStrapiUrl("init");
 
 type StrapiFetchOptions = {
   locale: Locale;
+  /** @deprecated ISR disabled — Strapi fetches use cache: "no-store" for stabilization. */
   revalidate?: number | false;
+  /** @deprecated Unused while Strapi fetches use cache: "no-store". */
   tags?: string[];
   timeoutMs?: number;
 };
@@ -57,30 +59,28 @@ export function parseJsonArray<T>(value: unknown): T[] {
 
 export async function strapiFetch<T>(
   path: string,
-  {
-    locale,
-    revalidate = 60,
-    tags = [],
-    timeoutMs = DEFAULT_FETCH_TIMEOUT_MS
-  }: StrapiFetchOptions
+  { locale, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS }: StrapiFetchOptions
 ): Promise<T | null> {
-  if (!STRAPI_URL) return null;
+  const strapiUrl = getStrapiUrl();
+  if (!strapiUrl) return null;
 
   const separator = path.includes("?") ? "&" : "?";
-  const url = `${STRAPI_URL}${path}${separator}locale=${locale}`;
+  const url = `${strapiUrl}${path}${separator}locale=${locale}`;
 
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(timeoutMs),
-      next: {
-        revalidate: revalidate === false ? 0 : revalidate,
-        tags: tags.length ? tags : undefined
-      }
+      cache: "no-store"
     });
 
-    if (!res.ok) return null;
+    if (!res.ok) {
+      console.warn(`[CMS] Strapi fetch failed (${res.status}):`, url);
+      return null;
+    }
+
     return (await res.json()) as T;
-  } catch {
+  } catch (error) {
+    console.warn("[CMS] Strapi fetch error:", url, error);
     return null;
   }
 }

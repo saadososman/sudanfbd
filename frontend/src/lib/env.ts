@@ -19,6 +19,12 @@ export function getStrapiUrl() {
   return "";
 }
 
+export function logStrapiUrl(context = "runtime") {
+  const url = getStrapiUrl();
+  console.log(`[CMS] NEXT_PUBLIC_STRAPI_URL (${context}):`, url || "(not configured)");
+  return url;
+}
+
 export function getSiteUrl() {
   const configured = trimUrl(process.env.NEXT_PUBLIC_SITE_URL);
   if (configured) {
