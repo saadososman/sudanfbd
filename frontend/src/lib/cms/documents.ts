@@ -1,4 +1,5 @@
 import { getMediaUrl, strapiFetch, unwrapCollectionItems } from "@/lib/cms/client";
+import { getFallbackDocuments } from "@/lib/cms/fallbacks-documents";
 import type { Locale } from "@/lib/i18n";
 
 export type DocumentItem = {
@@ -75,9 +76,11 @@ export async function fetchDocuments(locale: Locale): Promise<DocumentItem[]> {
     { locale, revalidate: 120, tags: [`documents-${locale}`], timeoutMs: 8000 }
   );
 
-  if (!payload?.data?.length) return [];
+  if (!payload?.data?.length) return getFallbackDocuments(locale);
 
-  return unwrapCollectionItems(payload)
+  const items = unwrapCollectionItems(payload)
     .map((item) => mapDocumentItem(item as Record<string, unknown>, locale))
     .filter((item): item is DocumentItem => item !== null);
+
+  return items.length > 0 ? items : getFallbackDocuments(locale);
 }

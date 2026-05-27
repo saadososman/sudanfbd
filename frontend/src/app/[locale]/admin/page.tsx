@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { AdminDashboard } from "@/components/AdminDashboard";
 import { PageTitle } from "@/components/PageTitle";
 import {
@@ -22,10 +21,6 @@ export async function generateMetadata({
     fetchSiteConfig(locale)
   ]);
 
-  if (!page) {
-    return {};
-  }
-
   return {
     title: page.seo?.metaTitle ?? `${page.title} | ${siteConfig.siteName}`,
     description: page.seo?.metaDescription ?? page.intro
@@ -43,8 +38,6 @@ export default async function AdminPage({
     fetchSiteConfig(locale),
     fetchSectors(locale)
   ]);
-
-  if (!page) notFound();
 
   return (
     <>

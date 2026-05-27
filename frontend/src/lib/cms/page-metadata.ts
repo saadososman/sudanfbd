@@ -9,10 +9,6 @@ export async function buildStaticPageMetadata(
 ): Promise<Metadata> {
   const page = await fetchPageBySlug(locale, slug);
 
-  if (!page) {
-    return {};
-  }
-
   return {
     title: page.seo?.metaTitle ?? page.title,
     description: page.seo?.metaDescription ?? page.intro

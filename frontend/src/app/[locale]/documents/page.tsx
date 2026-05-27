@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { PageTitle } from "@/components/PageTitle";
 import { PdfLibrary } from "@/components/PdfLibrary";
 import { fetchDocuments } from "@/lib/api";
@@ -19,10 +18,6 @@ export async function generateMetadata({
     fetchSiteConfig(locale)
   ]);
 
-  if (!page) {
-    return {};
-  }
-
   return {
     title: page.seo?.metaTitle ?? `${page.title} | ${siteConfig.siteName}`,
     description: page.seo?.metaDescription ?? page.intro
@@ -40,8 +35,6 @@ export default async function DocumentsPage({
     fetchSiteConfig(locale),
     fetchDocuments(locale)
   ]);
-
-  if (!page) notFound();
 
   return (
     <>

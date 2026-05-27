@@ -51,7 +51,13 @@ export function mergeNavigation(
     (cmsItem) => !fallbackNavigation.some((fallbackItem) => fallbackItem.path === cmsItem.path)
   );
 
-  return [...mergedFallback, ...extraItems].sort((a, b) => a.order - b.order);
+  const merged = [...mergedFallback, ...extraItems].sort((a, b) => a.order - b.order);
+
+  if (!merged.some((item) => item.isVisible && item.label.trim())) {
+    return fallbackNavigation;
+  }
+
+  return merged;
 }
 
 export function mergeSiteConfigWithCms(

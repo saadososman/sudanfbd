@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import { PageSectionRenderer } from "@/components/PageSectionRenderer";
 import { PageTitle } from "@/components/PageTitle";
 import { buildStaticPageMetadata } from "@/lib/cms/page-metadata";
@@ -26,8 +25,6 @@ export default async function MethodologyPage({
     fetchPageBySlug(locale, "methodology"),
     fetchSiteConfig(locale)
   ]);
-
-  if (!page) notFound();
 
   return (
     <>

@@ -6,11 +6,9 @@ import {
   getFallbackObjectivesSection
 } from "@/lib/cms/fallbacks-content-sections";
 import { getContentFallback } from "@/lib/cms/fallbacks-content";
+import type { PageSlug } from "@/lib/cms/constants";
 import type { CmsPage, CmsPageSection } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
-
-export const STATIC_PAGE_SLUGS = ["about", "objectives", "methodology", "framework"] as const;
-export type StaticPageSlug = (typeof STATIC_PAGE_SLUGS)[number];
 
 function getAboutSections(locale: Locale): CmsPageSection[] {
   return [
@@ -28,7 +26,7 @@ function getFrameworkSections(locale: Locale): CmsPageSection[] {
   return [getFallbackFrameworkSection(locale)];
 }
 
-export function getFallbackPage(slug: StaticPageSlug, locale: Locale): CmsPage {
+export function getFallbackPage(slug: PageSlug, locale: Locale): CmsPage {
   const content = getContentFallback(locale);
 
   switch (slug) {
@@ -75,6 +73,28 @@ export function getFallbackPage(slug: StaticPageSlug, locale: Locale): CmsPage {
           metaDescription: content.framework.intro
         },
         sections: getFrameworkSections(locale)
+      };
+    case "documents":
+      return {
+        slug,
+        title: content.nav.documents,
+        intro: content.hero.body,
+        seo: {
+          metaTitle: `${content.nav.documents} | ${content.brand}`,
+          metaDescription: content.hero.body
+        },
+        sections: []
+      };
+    case "admin":
+      return {
+        slug,
+        title: content.nav.admin,
+        intro: content.ui.adminIntegrationBody,
+        seo: {
+          metaTitle: `${content.nav.admin} | ${content.brand}`,
+          metaDescription: content.ui.adminIntegrationBody
+        },
+        sections: []
       };
   }
 }
