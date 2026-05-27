@@ -4,7 +4,10 @@ import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
 import { UiLabelsProvider } from "@/components/UiLabelsProvider";
 import { fetchActiveAnnouncements, fetchSiteConfig } from "@/lib/cms";
+import { logCmsEnv } from "@/lib/env";
 import { dictionary, isLocale, type Locale } from "@/lib/i18n";
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return [{ locale: "ar" }, { locale: "en" }];
@@ -20,6 +23,7 @@ export default async function LocaleLayout({
   const { locale: localeParam } = await params;
   if (!isLocale(localeParam)) notFound();
   const locale = localeParam as Locale;
+  logCmsEnv("layout");
   const t = dictionary[locale];
   const [siteConfig, announcements] = await Promise.all([
     fetchSiteConfig(locale),
