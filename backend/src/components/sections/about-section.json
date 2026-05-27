@@ -1,0 +1,28 @@
+{
+  "collectionName": "components_sections_about_sections",
+  "info": {
+    "displayName": "About Section",
+    "description": "Manifesto and identity content block",
+    "icon": "book"
+  },
+  "options": {},
+  "attributes": {
+    "kicker": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "paragraphs": {
+      "type": "json"
+    },
+    "bulletPoints": {
+      "type": "json"
+    },
+    "compact": {
+      "type": "boolean",
+      "default": false
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_sections_mission_values_sections",
+  "info": {
+    "displayName": "Mission & Values Section",
+    "description": "Mission statement with operating principles panel",
+    "icon": "heart"
+  },
+  "options": {},
+  "attributes": {
+    "missionTitle": {
+      "type": "string",
+      "required": true
+    },
+    "missionText": {
+      "type": "text",
+      "required": true
+    },
+    "valuesTitle": {
+      "type": "string"
+    },
+    "values": {
+      "type": "json",
+      "required": true
+    }
+  }
+}

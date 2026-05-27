@@ -1,3 +1,4 @@
+export { fetchActiveAnnouncements } from "@/lib/cms/announcements";
 export { fetchSiteConfig } from "@/lib/cms/site-config";
 export { fetchHomepage } from "@/lib/cms/homepage";
 export { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
@@ -13,10 +14,16 @@ export {
 } from "@/lib/cms/sectors";
 export { getFallbackSiteConfig } from "@/lib/cms/fallbacks";
 export type {
+  CmsAboutSection,
   CmsAnnouncement,
+  CmsContentSection,
   CmsHomepage,
   CmsHomeSection,
+  CmsMethodologySection,
+  CmsFrameworkSection,
+  CmsMissionValuesSection,
   CmsNavItem,
+  CmsObjectivesSectionBlock,
   CmsPage,
   CmsPageSection,
   CmsSector,

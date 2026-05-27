@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
+import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
-import { fetchSiteConfig } from "@/lib/cms";
+import { fetchActiveAnnouncements, fetchSiteConfig } from "@/lib/cms";
 import { dictionary, isLocale, type Locale } from "@/lib/i18n";
 
 export function generateStaticParams() {
@@ -19,13 +20,17 @@ export default async function LocaleLayout({
   if (!isLocale(localeParam)) notFound();
   const locale = localeParam as Locale;
   const t = dictionary[locale];
-  const siteConfig = await fetchSiteConfig(locale);
+  const [siteConfig, announcements] = await Promise.all([
+    fetchSiteConfig(locale),
+    fetchActiveAnnouncements(locale)
+  ]);
 
   return (
     <html lang={locale} dir={t.dir}>
       <body>
         <div className="site-shell">
           <Header locale={locale} siteConfig={siteConfig} />
+          <AnnouncementBanner locale={locale} announcements={announcements} />
           <main className="main">{children}</main>
           <Footer siteConfig={siteConfig} />
         </div>

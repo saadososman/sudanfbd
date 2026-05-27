@@ -51,6 +51,11 @@
     "sections": {
       "type": "dynamiczone",
       "components": [
+        "sections.about-section",
+        "sections.objectives-section",
+        "sections.methodology-section",
+        "sections.framework-section",
+        "sections.mission-values-section",
         "sections.rich-content-section",
         "sections.cta-banner-section",
         "sections.stats-section",

@@ -5,7 +5,7 @@
     "singularName": "homepage",
     "pluralName": "homepages",
     "displayName": "Homepage",
-    "description": "Homepage sections and content blocks"
+    "description": "Homepage sections: Hero, Statistics, About, Objectives, teasers, and CTA"
   },
   "options": {
     "draftAndPublish": true
@@ -31,9 +31,13 @@
       "components": [
         "sections.hero-section",
         "sections.stats-section",
-        "sections.rich-content-section",
+        "sections.about-section",
+        "sections.objectives-section",
+        "sections.methodology-section",
+        "sections.framework-section",
         "sections.content-teaser-section",
-        "sections.cta-banner-section"
+        "sections.cta-banner-section",
+        "sections.rich-content-section"
       ],
       "pluginOptions": {
         "i18n": {

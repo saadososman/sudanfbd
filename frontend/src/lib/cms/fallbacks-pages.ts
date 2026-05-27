@@ -8,7 +8,7 @@ function getObjectivesSection(locale: Locale): CmsPageSection {
   const objectives = dictionary[locale].objectives;
 
   return {
-    __component: "sections.rich-content-section",
+    __component: "sections.objectives-section",
     kicker: objectives.kicker,
     title: objectives.title,
     paragraphs: [...objectives.paragraphs],
@@ -26,19 +26,20 @@ function getAboutSections(locale: Locale): CmsPageSection[] {
 
   return [
     {
-      __component: "sections.rich-content-section",
+      __component: "sections.about-section",
       kicker: t.manifesto.kicker,
       title: t.manifesto.title,
       paragraphs: [...t.manifesto.paragraphs],
-      bulletPoints: [...t.manifesto.points]
+      bulletPoints: [...t.manifesto.points],
+      compact: true
     },
     getObjectivesSection(locale),
     {
-      __component: "sections.rich-content-section",
-      kicker: isArabic ? "مبادئ العمل" : "Operating Principles",
-      title: t.about.mission,
-      paragraphs: [t.about.missionText],
-      bulletPoints: [...t.about.values]
+      __component: "sections.mission-values-section",
+      missionTitle: t.about.mission,
+      missionText: t.about.missionText,
+      valuesTitle: isArabic ? "مبادئ العمل" : "Operating Principles",
+      values: [...t.about.values]
     }
   ];
 }
@@ -48,18 +49,13 @@ function getMethodologySections(locale: Locale): CmsPageSection[] {
 
   return [
     {
-      __component: "sections.rich-content-section",
-      title: methodology.title,
+      __component: "sections.methodology-section",
       cards: methodology.cards.map((card, index) => ({
         title: card.title,
         text: card.text,
         order: index
-      }))
-    },
-    {
-      __component: "sections.rich-content-section",
-      kicker: methodology.phasesTitle,
-      title: methodology.phasesTitle,
+      })),
+      phasesTitle: methodology.phasesTitle,
       phases: [...methodology.phases]
     }
   ];
@@ -70,7 +66,7 @@ function getFrameworkSections(locale: Locale): CmsPageSection[] {
 
   return [
     {
-      __component: "sections.rich-content-section",
+      __component: "sections.framework-section",
       title: framework.title,
       items: [...framework.items]
     }

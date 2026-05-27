@@ -58,6 +58,44 @@ export type CmsHeroSection = {
   insightTwo?: string;
 };
 
+export type CmsAboutSection = {
+  __component: "sections.about-section";
+  kicker?: string;
+  title: string;
+  paragraphs?: string[];
+  bulletPoints?: string[];
+  compact?: boolean;
+};
+
+export type CmsObjectivesSectionBlock = {
+  __component: "sections.objectives-section";
+  kicker?: string;
+  title: string;
+  paragraphs?: string[];
+  cards: CmsTextCard[];
+};
+
+export type CmsMethodologySection = {
+  __component: "sections.methodology-section";
+  cards: CmsTextCard[];
+  phasesTitle?: string;
+  phases?: string[];
+};
+
+export type CmsFrameworkSection = {
+  __component: "sections.framework-section";
+  title?: string;
+  items: string[];
+};
+
+export type CmsMissionValuesSection = {
+  __component: "sections.mission-values-section";
+  missionTitle: string;
+  missionText: string;
+  valuesTitle?: string;
+  values: string[];
+};
+
 export type CmsRichContentSection = {
   __component: "sections.rich-content-section";
   kicker?: string;
@@ -95,6 +133,32 @@ export type CmsCtaBannerSection = {
 
 export type CmsHomeSection =
   | CmsHeroSection
+  | CmsStatsSection
+  | CmsAboutSection
+  | CmsObjectivesSectionBlock
+  | CmsMethodologySection
+  | CmsFrameworkSection
+  | CmsRichContentSection
+  | CmsContentTeaserSection
+  | CmsCtaBannerSection;
+
+export type CmsPageSection =
+  | CmsAboutSection
+  | CmsObjectivesSectionBlock
+  | CmsMethodologySection
+  | CmsFrameworkSection
+  | CmsMissionValuesSection
+  | CmsRichContentSection
+  | CmsStatsSection
+  | CmsContentTeaserSection
+  | CmsCtaBannerSection;
+
+export type CmsContentSection =
+  | CmsAboutSection
+  | CmsObjectivesSectionBlock
+  | CmsMethodologySection
+  | CmsFrameworkSection
+  | CmsMissionValuesSection
   | CmsRichContentSection
   | CmsStatsSection
   | CmsContentTeaserSection
@@ -104,12 +168,6 @@ export type CmsHomepage = {
   seo?: CmsSeo;
   sections: CmsHomeSection[];
 };
-
-export type CmsPageSection =
-  | CmsRichContentSection
-  | CmsStatsSection
-  | CmsContentTeaserSection
-  | CmsCtaBannerSection;
 
 export type CmsPage = {
   slug: string;

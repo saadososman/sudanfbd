@@ -1,0 +1,26 @@
+{
+  "collectionName": "components_sections_objectives_sections",
+  "info": {
+    "displayName": "Objectives Section",
+    "description": "Forum objectives with card grid",
+    "icon": "bullseye"
+  },
+  "options": {},
+  "attributes": {
+    "kicker": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "required": true
+    },
+    "paragraphs": {
+      "type": "json"
+    },
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-card"
+    }
+  }
+}

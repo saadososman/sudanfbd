@@ -40,14 +40,14 @@ export function getFallbackHomepage(locale: Locale): CmsHomepage {
         }))
       },
       {
-        __component: "sections.rich-content-section",
+        __component: "sections.about-section",
         kicker: t.manifesto.kicker,
         title: t.manifesto.title,
         paragraphs: [...t.manifesto.paragraphs],
         bulletPoints: [...t.manifesto.points]
       },
       {
-        __component: "sections.rich-content-section",
+        __component: "sections.objectives-section",
         kicker: t.objectives.kicker,
         title: t.objectives.title,
         paragraphs: [...t.objectives.paragraphs],

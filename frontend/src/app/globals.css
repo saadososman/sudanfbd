@@ -59,6 +59,73 @@ textarea {
   box-shadow: 0 8px 24px rgba(6, 47, 34, 0.05);
 }
 
+.announcement-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.announcement-banner {
+  border-bottom: 1px solid rgba(219, 229, 223, 0.82);
+}
+
+.announcement-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 12px 0;
+}
+
+.announcement-copy {
+  min-width: 0;
+}
+
+.announcement-copy strong {
+  display: block;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.announcement-copy p {
+  margin: 4px 0 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  opacity: 0.92;
+}
+
+.announcement-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.announcement-info {
+  background: linear-gradient(90deg, rgba(7, 132, 73, 0.12), rgba(232, 246, 239, 0.95));
+  color: var(--green-deep);
+}
+
+.announcement-success {
+  background: linear-gradient(90deg, rgba(7, 132, 73, 0.18), rgba(7, 132, 73, 0.08));
+  color: var(--green-deep);
+}
+
+.announcement-warning {
+  background: linear-gradient(90deg, rgba(216, 181, 91, 0.28), rgba(216, 181, 91, 0.12));
+  color: #6b5318;
+}
+
+.announcement-urgent {
+  background: linear-gradient(90deg, rgba(207, 31, 46, 0.16), rgba(207, 31, 46, 0.08));
+  color: #8b1420;
+}
+
 .nav {
   width: min(1180px, calc(100% - 32px));
   min-height: 76px;
@@ -1578,6 +1645,11 @@ textarea {
 }
 
 @media (max-width: 860px) {
+  .announcement-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .nav {
     min-height: auto;
     padding: 14px 0;

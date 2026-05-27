@@ -1,5 +1,10 @@
 import { getStrapiUrl } from "@/lib/env";
-import type { CmsHomeSection, CmsPageSection } from "@/lib/cms/types";
+import type {
+  CmsContentSection,
+  CmsHeroSection,
+  CmsHomeSection,
+  CmsPageSection
+} from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
 const STRAPI_URL = getStrapiUrl();
@@ -188,7 +193,134 @@ export function mapStatItems(items: unknown) {
     .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 }
 
-export function mapHomeSections(sections: unknown): CmsHomeSection[] {
+function mapSectionItem(
+  fields: Record<string, unknown>
+): CmsContentSection | CmsHeroSection | null {
+  const component = fields.__component;
+
+  if (component === "sections.hero-section") {
+    return {
+      __component: "sections.hero-section" as const,
+      eyebrow: typeof fields.eyebrow === "string" ? fields.eyebrow : undefined,
+      title: typeof fields.title === "string" ? fields.title : "",
+      body: typeof fields.body === "string" ? fields.body : undefined,
+      primaryCta: mapCtaLink(fields.primaryCta),
+      secondaryCta: mapCtaLink(fields.secondaryCta),
+      imageUrl: getMediaUrl(fields.image) || undefined,
+      insightOne: typeof fields.insightOne === "string" ? fields.insightOne : undefined,
+      insightTwo: typeof fields.insightTwo === "string" ? fields.insightTwo : undefined
+    };
+  }
+
+  if (component === "sections.about-section") {
+    return {
+      __component: "sections.about-section" as const,
+      kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+      title: typeof fields.title === "string" ? fields.title : "",
+      paragraphs: parseJsonArray<string>(fields.paragraphs),
+      bulletPoints: parseJsonArray<string>(fields.bulletPoints),
+      compact: fields.compact === true
+    };
+  }
+
+  if (component === "sections.objectives-section") {
+    return {
+      __component: "sections.objectives-section" as const,
+      kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+      title: typeof fields.title === "string" ? fields.title : "",
+      paragraphs: parseJsonArray<string>(fields.paragraphs),
+      cards: mapTextCards(fields.cards)
+    };
+  }
+
+  if (component === "sections.methodology-section") {
+    return {
+      __component: "sections.methodology-section" as const,
+      cards: mapTextCards(fields.cards),
+      phasesTitle: typeof fields.phasesTitle === "string" ? fields.phasesTitle : undefined,
+      phases: parseJsonArray<string>(fields.phases)
+    };
+  }
+
+  if (component === "sections.framework-section") {
+    return {
+      __component: "sections.framework-section" as const,
+      title: typeof fields.title === "string" ? fields.title : undefined,
+      items: parseJsonArray<string>(fields.items)
+    };
+  }
+
+  if (component === "sections.mission-values-section") {
+    const missionTitle = fields.missionTitle;
+    const missionText = fields.missionText;
+    if (typeof missionTitle !== "string" || typeof missionText !== "string") return null;
+
+    return {
+      __component: "sections.mission-values-section" as const,
+      missionTitle,
+      missionText,
+      valuesTitle: typeof fields.valuesTitle === "string" ? fields.valuesTitle : undefined,
+      values: parseJsonArray<string>(fields.values)
+    };
+  }
+
+  if (component === "sections.rich-content-section") {
+    return {
+      __component: "sections.rich-content-section" as const,
+      kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+      title: typeof fields.title === "string" ? fields.title : "",
+      intro: typeof fields.intro === "string" ? fields.intro : undefined,
+      paragraphs: parseJsonArray<string>(fields.paragraphs),
+      bulletPoints: parseJsonArray<string>(fields.bulletPoints),
+      cards: mapTextCards(fields.cards),
+      items: parseJsonArray<string>(fields.items),
+      phases: parseJsonArray<string>(fields.phases)
+    };
+  }
+
+  if (component === "sections.stats-section") {
+    return {
+      __component: "sections.stats-section" as const,
+      stats: mapStatItems(fields.stats)
+    };
+  }
+
+  if (component === "sections.content-teaser-section") {
+    const contentType = fields.contentType;
+    if (contentType !== "news" && contentType !== "sectors" && contentType !== "documents") {
+      return null;
+    }
+
+    const typedContentType = contentType as "news" | "sectors" | "documents";
+
+    return {
+      __component: "sections.content-teaser-section" as const,
+      kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
+      title: typeof fields.title === "string" ? fields.title : "",
+      intro: typeof fields.intro === "string" ? fields.intro : undefined,
+      contentType: typedContentType,
+      limit: typeof fields.limit === "number" ? fields.limit : 3,
+      viewAllLabel: typeof fields.viewAllLabel === "string" ? fields.viewAllLabel : undefined,
+      viewAllPath: typeof fields.viewAllPath === "string" ? fields.viewAllPath : undefined
+    };
+  }
+
+  if (component === "sections.cta-banner-section") {
+    return {
+      __component: "sections.cta-banner-section" as const,
+      title: typeof fields.title === "string" ? fields.title : "",
+      body: typeof fields.body === "string" ? fields.body : undefined,
+      cta: mapCtaLink(fields.cta)
+    };
+  }
+
+  return null;
+}
+
+function mapSectionsArray<T extends CmsHomeSection | CmsPageSection>(
+  sections: unknown,
+  allowHero: boolean
+): T[] {
   if (!Array.isArray(sections)) return [];
 
   return sections
@@ -196,138 +328,17 @@ export function mapHomeSections(sections: unknown): CmsHomeSection[] {
       if (!section || typeof section !== "object") return null;
 
       const fields = getItemFields(section as Record<string, unknown>);
-      const component = fields.__component;
+      if (!allowHero && fields.__component === "sections.hero-section") return null;
 
-      if (component === "sections.hero-section") {
-        return {
-          __component: "sections.hero-section" as const,
-          eyebrow: typeof fields.eyebrow === "string" ? fields.eyebrow : undefined,
-          title: typeof fields.title === "string" ? fields.title : "",
-          body: typeof fields.body === "string" ? fields.body : undefined,
-          primaryCta: mapCtaLink(fields.primaryCta),
-          secondaryCta: mapCtaLink(fields.secondaryCta),
-          imageUrl: getMediaUrl(fields.image) || undefined,
-          insightOne: typeof fields.insightOne === "string" ? fields.insightOne : undefined,
-          insightTwo: typeof fields.insightTwo === "string" ? fields.insightTwo : undefined
-        };
-      }
-
-      if (component === "sections.rich-content-section") {
-        return {
-          __component: "sections.rich-content-section" as const,
-          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
-          title: typeof fields.title === "string" ? fields.title : "",
-          intro: typeof fields.intro === "string" ? fields.intro : undefined,
-          paragraphs: parseJsonArray<string>(fields.paragraphs),
-          bulletPoints: parseJsonArray<string>(fields.bulletPoints),
-          cards: mapTextCards(fields.cards),
-          items: parseJsonArray<string>(fields.items),
-          phases: parseJsonArray<string>(fields.phases)
-        };
-      }
-
-      if (component === "sections.stats-section") {
-        return {
-          __component: "sections.stats-section" as const,
-          stats: mapStatItems(fields.stats)
-        };
-      }
-
-      if (component === "sections.content-teaser-section") {
-        const contentType = fields.contentType;
-        if (contentType !== "news" && contentType !== "sectors" && contentType !== "documents") {
-          return null;
-        }
-
-        const typedContentType = contentType as "news" | "sectors" | "documents";
-
-        return {
-          __component: "sections.content-teaser-section" as const,
-          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
-          title: typeof fields.title === "string" ? fields.title : "",
-          intro: typeof fields.intro === "string" ? fields.intro : undefined,
-          contentType: typedContentType,
-          limit: typeof fields.limit === "number" ? fields.limit : 3,
-          viewAllLabel: typeof fields.viewAllLabel === "string" ? fields.viewAllLabel : undefined,
-          viewAllPath: typeof fields.viewAllPath === "string" ? fields.viewAllPath : undefined
-        };
-      }
-
-      if (component === "sections.cta-banner-section") {
-        return {
-          __component: "sections.cta-banner-section" as const,
-          title: typeof fields.title === "string" ? fields.title : "",
-          body: typeof fields.body === "string" ? fields.body : undefined,
-          cta: mapCtaLink(fields.cta)
-        };
-      }
-
-      return null;
+      return mapSectionItem(fields);
     })
-    .filter((section): section is NonNullable<typeof section> => section !== null);
+    .filter((section): section is NonNullable<typeof section> => section !== null) as T[];
+}
+
+export function mapHomeSections(sections: unknown): CmsHomeSection[] {
+  return mapSectionsArray<CmsHomeSection>(sections, true);
 }
 
 export function mapPageSections(sections: unknown): CmsPageSection[] {
-  if (!Array.isArray(sections)) return [];
-
-  return sections
-    .map((section) => {
-      if (!section || typeof section !== "object") return null;
-
-      const fields = getItemFields(section as Record<string, unknown>);
-      const component = fields.__component;
-
-      if (component === "sections.rich-content-section") {
-        return {
-          __component: "sections.rich-content-section" as const,
-          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
-          title: typeof fields.title === "string" ? fields.title : "",
-          intro: typeof fields.intro === "string" ? fields.intro : undefined,
-          paragraphs: parseJsonArray<string>(fields.paragraphs),
-          bulletPoints: parseJsonArray<string>(fields.bulletPoints),
-          cards: mapTextCards(fields.cards),
-          items: parseJsonArray<string>(fields.items),
-          phases: parseJsonArray<string>(fields.phases)
-        };
-      }
-
-      if (component === "sections.stats-section") {
-        return {
-          __component: "sections.stats-section" as const,
-          stats: mapStatItems(fields.stats)
-        };
-      }
-
-      if (component === "sections.content-teaser-section") {
-        const contentType = fields.contentType;
-        if (contentType !== "news" && contentType !== "sectors" && contentType !== "documents") {
-          return null;
-        }
-
-        const typedContentType = contentType as "news" | "sectors" | "documents";
-
-        return {
-          __component: "sections.content-teaser-section" as const,
-          kicker: typeof fields.kicker === "string" ? fields.kicker : undefined,
-          title: typeof fields.title === "string" ? fields.title : "",
-          intro: typeof fields.intro === "string" ? fields.intro : undefined,
-          contentType: typedContentType,
-          limit: typeof fields.limit === "number" ? fields.limit : 3,
-          viewAllLabel: typeof fields.viewAllLabel === "string" ? fields.viewAllLabel : undefined,
-          viewAllPath: typeof fields.viewAllPath === "string" ? fields.viewAllPath : undefined
-        };
-      }
-
-      if (component === "sections.cta-banner-section") {
-        return {
-          __component: "sections.cta-banner-section" as const,
-          title: typeof fields.title === "string" ? fields.title : "",
-          body: typeof fields.body === "string" ? fields.body : undefined,
-          cta: mapCtaLink(fields.cta)
-        };
-      }
-
-      return null;
-    })
-    .filter((section): section is NonNullable<typeof section> => section !== null);
+  return mapSectionsArray<CmsPageSection>(sections, false);
 }

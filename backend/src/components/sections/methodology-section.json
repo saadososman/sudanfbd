@@ -1,0 +1,22 @@
+{
+  "collectionName": "components_sections_methodology_sections",
+  "info": {
+    "displayName": "Methodology Section",
+    "description": "Work methodology cards and phases timeline",
+    "icon": "layer"
+  },
+  "options": {},
+  "attributes": {
+    "cards": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.text-card"
+    },
+    "phasesTitle": {
+      "type": "string"
+    },
+    "phases": {
+      "type": "json"
+    }
+  }
+}
