@@ -1,3 +1,5 @@
+import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
+import { mergeHomepageWithCms } from "@/lib/cms/homepage-merge";
 import {
   mapHomeSections,
   mapSeo,
@@ -50,18 +52,20 @@ export function getNewsListingFromHomepage(homepage: CmsHomepage) {
 }
 
 export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
+  const fallback = getFallbackHomepage(locale);
+
   const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
     `/api/homepage?${homepagePopulate}`,
     { locale, revalidate: 300, tags: [`homepage-${locale}`] }
   );
 
   const fields = unwrapSingleType<HomepagePayload>(payload);
-  if (!fields) {
-    return { sections: [] };
-  }
+  if (!fields) return fallback;
+
+  const cmsSections = mapHomeSections(fields.sections);
 
   return {
-    seo: mapSeo(fields),
-    sections: mapHomeSections(fields.sections)
+    seo: mapSeo(fields) ?? fallback.seo,
+    sections: mergeHomepageWithCms(fallback, cmsSections).sections
   };
 }
