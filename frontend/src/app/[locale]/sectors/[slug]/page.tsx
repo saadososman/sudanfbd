@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { PageTitle } from "@/components/PageTitle";
 import { SectorIcon } from "@/components/SectorIcon";
 import { fetchSectorBySlug, fetchSectorSlugs, fetchSiteConfig, getNavLabel } from "@/lib/cms";
+import { getCategoryLabel } from "@/lib/cms/sector-categories";
 import type { Locale } from "@/lib/i18n";
 
 export async function generateStaticParams() {
@@ -60,15 +61,15 @@ export default async function SectorPage({
             <span className="sector-profile-icon">
               <SectorIcon name={sector.icon} size={32} />
             </span>
-            <p className="sector-profile-label">{sector.categoryLabel}</p>
+            <p className="sector-profile-label">
+              {getCategoryLabel(sector.category, siteConfig.uiLabels)}
+            </p>
             <h2>{sector.title}</h2>
             <p>{sector.summary}</p>
           </aside>
           <article className="sector-scope reveal delay-1">
-            <span className="section-kicker">
-              {locale === "ar" ? "اختصاصات ومجال عمل" : "Mandate and Scope"}
-            </span>
-            <h2>{locale === "ar" ? "نطاق العمل" : "Scope of Work"}</h2>
+            <span className="section-kicker">{siteConfig.uiLabels.sectorScopeKicker}</span>
+            <h2>{siteConfig.uiLabels.sectorScopeTitle}</h2>
             {sector.body.includes("<") ? (
               <div
                 className="sector-body"

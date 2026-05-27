@@ -81,6 +81,16 @@
           "localized": true
         }
       }
+    },
+    "uiLabels": {
+      "type": "component",
+      "repeatable": false,
+      "component": "shared.ui-labels",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
     }
   }
 }

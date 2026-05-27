@@ -6,6 +6,7 @@ import {
   unwrapSingleType
 } from "@/lib/cms/client";
 import type { CmsSiteConfig } from "@/lib/cms/types";
+import { emptyUiLabels, mapUiLabels } from "@/lib/cms/ui-labels";
 import type { Locale } from "@/lib/i18n";
 
 type SiteConfigPayload = {
@@ -17,6 +18,7 @@ type SiteConfigPayload = {
   logo?: unknown;
   navigation?: unknown;
   defaultSeo?: unknown;
+  uiLabels?: unknown;
 };
 
 function emptySiteConfig(): CmsSiteConfig {
@@ -26,7 +28,8 @@ function emptySiteConfig(): CmsSiteConfig {
     brandSubtitle: "",
     footerTagline: "",
     footerNote: "",
-    navigation: []
+    navigation: [],
+    uiLabels: emptyUiLabels()
   };
 }
 
@@ -44,7 +47,8 @@ function mapSiteConfigFields(fields: SiteConfigPayload): CmsSiteConfig {
     footerNote: typeof fields.footerNote === "string" ? fields.footerNote : "",
     logoUrl: getMediaUrl(fields.logo) || undefined,
     navigation: mapNavItems(fields.navigation),
-    defaultSeo: mapSeo(fields)
+    defaultSeo: mapSeo(fields),
+    uiLabels: mapUiLabels(fields.uiLabels)
   };
 }
 
@@ -54,7 +58,7 @@ export function getNavLabel(config: CmsSiteConfig, path: string) {
 
 export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
-    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[defaultSeo][populate][ogImage]=*",
+    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[defaultSeo][populate][ogImage]=*&populate[uiLabels]=*",
     { locale, revalidate: 300, tags: [`site-config-${locale}`] }
   );
 

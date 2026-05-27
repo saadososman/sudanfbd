@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { AnnouncementBanner } from "@/components/AnnouncementBanner";
 import { Footer } from "@/components/Footer";
 import { Header } from "@/components/Header";
+import { UiLabelsProvider } from "@/components/UiLabelsProvider";
 import { fetchActiveAnnouncements, fetchSiteConfig } from "@/lib/cms";
 import { dictionary, isLocale, type Locale } from "@/lib/i18n";
 
@@ -28,12 +29,14 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={t.dir}>
       <body>
-        <div className="site-shell">
-          <Header locale={locale} siteConfig={siteConfig} />
-          <AnnouncementBanner locale={locale} announcements={announcements} />
-          <main className="main">{children}</main>
-          <Footer siteConfig={siteConfig} />
-        </div>
+        <UiLabelsProvider labels={siteConfig.uiLabels}>
+          <div className="site-shell">
+            <Header locale={locale} siteConfig={siteConfig} />
+            <AnnouncementBanner locale={locale} announcements={announcements} />
+            <main className="main">{children}</main>
+            <Footer siteConfig={siteConfig} />
+          </div>
+        </UiLabelsProvider>
       </body>
     </html>
   );

@@ -15,6 +15,42 @@ export type CmsNavItem = {
   openInNewTab: boolean;
 };
 
+export type CmsUiLabels = {
+  search: string;
+  newsSearch: string;
+  newsLabel: string;
+  noNews: string;
+  readArticle: string;
+  publishedOn: string;
+  backToNews: string;
+  readMore: string;
+  download: string;
+  noDocs: string;
+  upload: string;
+  publish: string;
+  formTitle: string;
+  sector: string;
+  file: string;
+  formLocale: string;
+  statusReady: string;
+  sectorsSearch: string;
+  sectorsEmpty: string;
+  viewSector: string;
+  adminIntegrationTitle: string;
+  adminIntegrationBody: string;
+  uploadDisabled: string;
+  uploading: string;
+  uploadSuccess: string;
+  uploadFailed: string;
+  sectorScopeKicker: string;
+  sectorScopeTitle: string;
+  categoryEconomic: string;
+  categoryServices: string;
+  categoryGovernance: string;
+  categoryInfrastructure: string;
+  categorySocial: string;
+};
+
 export type CmsSiteConfig = {
   siteName: string;
   shortName: string;
@@ -24,6 +60,7 @@ export type CmsSiteConfig = {
   logoUrl?: string;
   navigation: CmsNavItem[];
   defaultSeo?: CmsSeo;
+  uiLabels: CmsUiLabels;
 };
 
 export type CmsCtaLink = {
@@ -204,7 +241,6 @@ export type CmsSector = {
   body: string;
   outputs: string[];
   category: SectorCategory;
-  categoryLabel: string;
   icon: string;
   coverImageUrl?: string;
   order: number;

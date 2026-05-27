@@ -5,13 +5,24 @@ import {
   unwrapCollectionItems
 } from "@/lib/cms/client";
 import {
-  STATIC_PAGE_SLUGS,
-  type StaticPageSlug
+  CONTENT_PAGE_SLUGS,
+  PAGE_SLUGS,
+  type ContentPageSlug,
+  type PageSlug
 } from "@/lib/cms/constants";
 import type { CmsPage } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
-export { STATIC_PAGE_SLUGS, type StaticPageSlug } from "@/lib/cms/constants";
+export {
+  CONTENT_PAGE_SLUGS,
+  LISTING_PAGE_SLUGS,
+  PAGE_SLUGS,
+  STATIC_PAGE_SLUGS,
+  type ContentPageSlug,
+  type ListingPageSlug,
+  type PageSlug,
+  type StaticPageSlug
+} from "@/lib/cms/constants";
 
 type PagePayload = {
   slug?: string;
@@ -31,13 +42,17 @@ const pagePopulate =
   "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
   "&populate[seo][populate][ogImage]=*";
 
-export function isStaticPageSlug(slug: string): slug is StaticPageSlug {
-  return (STATIC_PAGE_SLUGS as readonly string[]).includes(slug);
+export function isStaticPageSlug(slug: string): slug is ContentPageSlug {
+  return (CONTENT_PAGE_SLUGS as readonly string[]).includes(slug);
+}
+
+export function isPageSlug(slug: string): slug is PageSlug {
+  return (PAGE_SLUGS as readonly string[]).includes(slug);
 }
 
 export async function fetchPageBySlug(
   locale: Locale,
-  slug: StaticPageSlug
+  slug: PageSlug
 ): Promise<CmsPage | null> {
   const payload = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     `/api/pages?filters[slug][$eq]=${encodeURIComponent(slug)}&${pagePopulate}&pagination[pageSize]=1`,

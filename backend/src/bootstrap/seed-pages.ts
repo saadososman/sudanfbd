@@ -11,7 +11,14 @@ import {
 } from "./seed-data/website-content";
 
 const PAGE_UID = "api::page.page";
-const PAGE_SLUGS: PageSlug[] = ["about", "objectives", "methodology", "framework"];
+const PAGE_SLUGS: PageSlug[] = [
+  "about",
+  "objectives",
+  "methodology",
+  "framework",
+  "documents",
+  "admin"
+];
 
 export async function seedPages(strapi: SeedStrapi) {
   const documents = strapi.documents(PAGE_UID);

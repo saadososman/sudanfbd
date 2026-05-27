@@ -3,7 +3,6 @@ import {
   parseJsonArray,
   strapiFetch
 } from "@/lib/cms/client";
-import { categoryLabel } from "@/lib/cms/sector-categories";
 import type { CmsSector, SectorCategory } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -60,7 +59,6 @@ function mapSectorItem(
       summary,
     outputs,
     category: resolvedCategory,
-    categoryLabel: categoryLabel(resolvedCategory, locale),
     icon: typeof fields.icon === "string" ? fields.icon : "clipboard",
     coverImageUrl: getMediaUrl(fields.coverImage ?? fields.coverimage) || undefined,
     order: typeof fields.order === "number" ? fields.order : 0

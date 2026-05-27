@@ -6,7 +6,7 @@ import { PageTitle } from "@/components/PageTitle";
 import { ArticleContent } from "@/components/ArticleContent";
 import { fetchArticle, formatArticleDate } from "@/lib/articles";
 import { fetchSiteConfig, getNavLabel } from "@/lib/cms";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 import { localePath } from "@/lib/locale-path";
 
 export async function generateMetadata({
@@ -40,7 +40,7 @@ export default async function NewsArticlePage({
     fetchArticle(locale, id),
     fetchSiteConfig(locale)
   ]);
-  const t = dictionary[locale];
+  const labels = siteConfig.uiLabels;
 
   if (!article) notFound();
 
@@ -50,7 +50,7 @@ export default async function NewsArticlePage({
         title={article.title}
         intro={
           article.publishedAt
-            ? `${t.publishedOn} ${formatArticleDate(article.publishedAt, locale)}`
+            ? `${labels.publishedOn} ${formatArticleDate(article.publishedAt, locale)}`
             : undefined
         }
         crumb={getNavLabel(siteConfig, "news")}
@@ -60,7 +60,7 @@ export default async function NewsArticlePage({
           <ArticleContent content={article.content} />
           <Link className="button light article-back" href={localePath(locale, "news")}>
             <ArrowLeft size={18} />
-            {t.backToNews}
+            {labels.backToNews}
           </Link>
         </div>
       </section>

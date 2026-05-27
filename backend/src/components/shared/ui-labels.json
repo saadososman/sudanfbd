@@ -1,0 +1,42 @@
+{
+  "collectionName": "components_shared_ui_labels",
+  "info": {
+    "displayName": "UI Labels",
+    "description": "Localized interface strings for search, buttons, and empty states"
+  },
+  "attributes": {
+    "search": { "type": "string" },
+    "newsSearch": { "type": "string" },
+    "newsLabel": { "type": "string" },
+    "noNews": { "type": "string" },
+    "readArticle": { "type": "string" },
+    "publishedOn": { "type": "string" },
+    "backToNews": { "type": "string" },
+    "readMore": { "type": "string" },
+    "download": { "type": "string" },
+    "noDocs": { "type": "string" },
+    "upload": { "type": "string" },
+    "publish": { "type": "string" },
+    "formTitle": { "type": "string" },
+    "sector": { "type": "string" },
+    "file": { "type": "string" },
+    "formLocale": { "type": "string" },
+    "statusReady": { "type": "string" },
+    "sectorsSearch": { "type": "string" },
+    "sectorsEmpty": { "type": "string" },
+    "viewSector": { "type": "string" },
+    "adminIntegrationTitle": { "type": "string" },
+    "adminIntegrationBody": { "type": "text" },
+    "uploadDisabled": { "type": "string" },
+    "uploading": { "type": "string" },
+    "uploadSuccess": { "type": "string" },
+    "uploadFailed": { "type": "string" },
+    "sectorScopeKicker": { "type": "string" },
+    "sectorScopeTitle": { "type": "string" },
+    "categoryEconomic": { "type": "string" },
+    "categoryServices": { "type": "string" },
+    "categoryGovernance": { "type": "string" },
+    "categoryInfrastructure": { "type": "string" },
+    "categorySocial": { "type": "string" }
+  }
+}

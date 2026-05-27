@@ -3,6 +3,8 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { Search } from "lucide-react";
+import { getCategoryLabel } from "@/lib/cms/sector-categories";
+import { useUiLabels } from "@/components/UiLabelsProvider";
 import type { CmsSector } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -12,9 +14,8 @@ type Props = {
 };
 
 export function SectorDirectory({ locale, sectors }: Props) {
+  const labels = useUiLabels();
   const [query, setQuery] = useState("");
-
-  const isArabic = locale === "ar";
 
   const filteredSectors = useMemo(() => {
     const normalized = query.trim().toLowerCase();
@@ -22,13 +23,14 @@ export function SectorDirectory({ locale, sectors }: Props) {
     if (!normalized) return sectors;
 
     return sectors.filter((sector) => {
+      const categoryLabel = getCategoryLabel(sector.category, labels);
       return (
         sector.title.toLowerCase().includes(normalized) ||
         sector.summary.toLowerCase().includes(normalized) ||
-        sector.categoryLabel.toLowerCase().includes(normalized)
+        categoryLabel.toLowerCase().includes(normalized)
       );
     });
-  }, [query, sectors]);
+  }, [labels, query, sectors]);
 
   return (
     <div className="sector-directory">
@@ -38,29 +40,27 @@ export function SectorDirectory({ locale, sectors }: Props) {
           <input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder={isArabic ? "ابحث في القطاعات" : "Search sectors"}
+            placeholder={labels.sectorsSearch}
           />
         </label>
       </div>
 
       {filteredSectors.length === 0 ? (
-        <p className="sector-empty">
-          {isArabic
-            ? "لا توجد قطاعات منشورة حالياً من لوحة Strapi."
-            : "No published sectors are available from Strapi yet."}
-        </p>
+        <p className="sector-empty">{labels.sectorsEmpty}</p>
       ) : (
         <div className="sector-grid">
           {filteredSectors.map((sector) => (
             <article className="sector-card reveal" key={sector.id}>
-              <span className="sector-category">{sector.categoryLabel}</span>
+              <span className="sector-category">
+                {getCategoryLabel(sector.category, labels)}
+              </span>
 
               <h2>{sector.title}</h2>
 
               <p>{sector.summary}</p>
 
               <Link href={`/${locale}/sectors/${sector.slug}`}>
-                {isArabic ? "عرض القطاع" : "View sector"}
+                {labels.viewSector}
               </Link>
             </article>
           ))}

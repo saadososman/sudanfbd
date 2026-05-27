@@ -2,18 +2,18 @@ import Link from "next/link";
 import { ArrowUpRight, Newspaper } from "lucide-react";
 import type { ArticleItem } from "@/lib/articles";
 import { formatArticleDate } from "@/lib/articles";
+import type { CmsUiLabels } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
 
 export function NewsCard({
   article,
-  locale
+  locale,
+  labels
 }: {
   article: ArticleItem;
   locale: Locale;
+  labels: CmsUiLabels;
 }) {
-  const t = dictionary[locale];
-
   return (
     <Link className="news-card" href={`/${locale}/news/${article.id}`}>
       <div className="news-card-media">
@@ -29,13 +29,13 @@ export function NewsCard({
       <div className="news-card-body">
         <p className="news-card-date">
           {article.publishedAt
-            ? `${t.publishedOn} ${formatArticleDate(article.publishedAt, locale)}`
-            : t.newsLabel}
+            ? `${labels.publishedOn} ${formatArticleDate(article.publishedAt, locale)}`
+            : labels.newsLabel}
         </p>
         <h3>{article.title}</h3>
         {article.excerpt ? <p>{article.excerpt}</p> : null}
         <span className="news-card-link">
-          {t.readArticle}
+          {labels.readArticle}
           <ArrowUpRight size={17} />
         </span>
       </div>

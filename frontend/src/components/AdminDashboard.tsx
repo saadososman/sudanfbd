@@ -2,9 +2,9 @@
 
 import { FormEvent, useState } from "react";
 import { UploadCloud } from "lucide-react";
+import { useUiLabels } from "@/components/UiLabelsProvider";
 import type { CmsSector } from "@/lib/cms/types";
-import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
+import { dictionary, type Locale } from "@/lib/i18n";
 
 export function AdminDashboard({
   locale,
@@ -15,13 +15,9 @@ export function AdminDashboard({
   sectors: CmsSector[];
   uploadEnabled: boolean;
 }) {
-  const t = dictionary[locale];
+  const labels = useUiLabels();
   const [status, setStatus] = useState<string>(
-    uploadEnabled
-      ? t.statusReady
-      : locale === "ar"
-        ? "الرفع غير مفعّل. أضف STRAPI_API_TOKEN في إعدادات الخادم."
-        : "Upload disabled. Add STRAPI_API_TOKEN on the server."
+    uploadEnabled ? labels.statusReady : labels.uploadDisabled
   );
   const [pending, setPending] = useState(false);
 
@@ -33,7 +29,7 @@ export function AdminDashboard({
     }
 
     setPending(true);
-    setStatus(locale === "ar" ? "جاري الرفع..." : "Uploading...");
+    setStatus(labels.uploading);
 
     try {
       const response = await fetch("/api/admin/documents", {
@@ -48,17 +44,10 @@ export function AdminDashboard({
       }
 
       event.currentTarget.reset();
-      setStatus(
-        locale === "ar" ? "تم رفع الوثيقة بنجاح." : "Document uploaded successfully."
-      );
+      setStatus(labels.uploadSuccess);
     } catch (error) {
       const message = error instanceof Error ? error.message : "";
-      setStatus(
-        message ||
-          (locale === "ar"
-            ? "تعذر رفع الوثيقة. تحقق من Strapi والرمز المميز."
-            : "Upload failed. Check Strapi and the API token.")
-      );
+      setStatus(message || labels.uploadFailed);
     } finally {
       setPending(false);
     }
@@ -68,11 +57,11 @@ export function AdminDashboard({
     <div className="admin-layout">
       <form className="panel form" onSubmit={onSubmit}>
         <label>
-          {t.title}
+          {labels.formTitle}
           <input className="input" name="title" required disabled={!uploadEnabled} />
         </label>
         <label>
-          {t.sector}
+          {labels.sector}
           <select
             className="input"
             name="sector"
@@ -87,14 +76,14 @@ export function AdminDashboard({
           </select>
         </label>
         <label>
-          {t.langName}
+          {labels.formLocale}
           <select className="input" name="locale" defaultValue={locale} disabled={!uploadEnabled}>
-            <option value="ar">العربية</option>
-            <option value="en">English</option>
+            <option value="ar">{dictionary.ar.langName}</option>
+            <option value="en">{dictionary.en.langName}</option>
           </select>
         </label>
         <label>
-          {t.file}
+          {labels.file}
           <input
             className="input"
             type="file"
@@ -105,17 +94,13 @@ export function AdminDashboard({
           />
         </label>
         <button className="button" disabled={pending || !uploadEnabled} type="submit">
-          <UploadCloud size={18} /> {pending ? t.upload : t.publish}
+          <UploadCloud size={18} /> {pending ? labels.upload : labels.publish}
         </button>
         <small>{status}</small>
       </form>
       <div className="panel">
-        <h2>{locale === "ar" ? "تكامل Strapi" : "Strapi Integration"}</h2>
-        <p>
-          {locale === "ar"
-            ? "يتم الرفع عبر مسار Next.js المحمي /api/admin/documents باستخدام STRAPI_API_TOKEN على الخادم فقط. لا حاجة لصلاحيات create العامة في Strapi."
-            : "Uploads go through the protected Next.js route /api/admin/documents using STRAPI_API_TOKEN on the server only. Public create permissions on Strapi are not required."}
-        </p>
+        <h2>{labels.adminIntegrationTitle}</h2>
+        <p>{labels.adminIntegrationBody}</p>
       </div>
     </div>
   );

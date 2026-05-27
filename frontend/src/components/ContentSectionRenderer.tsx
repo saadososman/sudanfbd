@@ -22,6 +22,7 @@ import { NewsSection } from "@/components/NewsSection";
 import { ObjectivesSection } from "@/components/ObjectivesSection";
 import { SectorGrid } from "@/components/SectorGrid";
 import { fetchLatestArticles } from "@/lib/articles";
+import { fetchSiteConfig } from "@/lib/cms/site-config";
 import { fetchSectors } from "@/lib/cms/sectors";
 import type {
   CmsAboutSection,
@@ -34,7 +35,8 @@ import type {
   CmsObjectivesSectionBlock,
   CmsRichContentSection,
   CmsStatsSection,
-  CmsTextCard
+  CmsTextCard,
+  CmsUiLabels
 } from "@/lib/cms/types";
 import { localePath } from "@/lib/locale-path";
 import type { Locale } from "@/lib/i18n";
@@ -305,12 +307,14 @@ function ContentTeaserSectionBlock({
   locale,
   section,
   sectors,
-  articles
+  articles,
+  labels
 }: {
   locale: Locale;
   section: CmsContentTeaserSection;
   sectors: Awaited<ReturnType<typeof fetchSectors>>;
   articles: Awaited<ReturnType<typeof fetchLatestArticles>>;
+  labels: CmsUiLabels;
 }) {
   const viewAllPath = section.viewAllPath ?? section.contentType;
   const limit = section.limit ?? 3;
@@ -320,6 +324,7 @@ function ContentTeaserSectionBlock({
       <NewsSection
         articles={articles.slice(0, limit)}
         locale={locale}
+        labels={labels}
         heading={{
           kicker: section.kicker,
           title: section.title,
@@ -341,7 +346,7 @@ function ContentTeaserSectionBlock({
           {section.intro ? <p>{section.intro}</p> : null}
         </div>
         <div className="container">
-          <SectorGrid locale={locale} sectors={sectors} limit={limit} />
+          <SectorGrid locale={locale} sectors={sectors} labels={labels} limit={limit} />
           {section.viewAllLabel ? (
             <div className="section-action">
               <Link className="button light" href={localePath(locale, viewAllPath)}>
@@ -403,6 +408,7 @@ function renderContentSection(
     compactAbout?: boolean;
     sectors: Awaited<ReturnType<typeof fetchSectors>>;
     articles: Awaited<ReturnType<typeof fetchLatestArticles>>;
+    labels: CmsUiLabels;
   }
 ) {
   switch (section.__component) {
@@ -443,6 +449,7 @@ function renderContentSection(
           section={section}
           sectors={options.sectors}
           articles={options.articles}
+          labels={options.labels}
           key={`teaser-${section.contentType}-${index}`}
         />
       );
@@ -487,12 +494,14 @@ export async function ContentSectionRenderer({
 
   const sectors = needsSectors ? await fetchSectors(locale) : [];
   const articles = needsNews ? await fetchLatestArticles(locale, newsLimit) : [];
+  const siteConfig = await fetchSiteConfig(locale);
 
   return sections.map((section, index) =>
     renderContentSection(locale, section, index, {
       compactAbout,
       sectors,
-      articles
+      articles,
+      labels: siteConfig.uiLabels
     })
   );
 }

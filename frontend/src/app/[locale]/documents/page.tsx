@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 import { PageTitle } from "@/components/PageTitle";
 import { PdfLibrary } from "@/components/PdfLibrary";
 import { fetchDocuments } from "@/lib/api";
-import { fetchSiteConfig, getNavLabel } from "@/lib/cms";
-import { dictionary, type Locale } from "@/lib/i18n";
+import { fetchPageBySlug, fetchSiteConfig, getNavLabel } from "@/lib/cms";
+import type { Locale } from "@/lib/i18n";
 
 export const revalidate = 300;
 
@@ -13,11 +14,18 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const [siteConfig, t] = [await fetchSiteConfig(locale), dictionary[locale]];
+  const [page, siteConfig] = await Promise.all([
+    fetchPageBySlug(locale, "documents"),
+    fetchSiteConfig(locale)
+  ]);
+
+  if (!page) {
+    return {};
+  }
 
   return {
-    title: `${t.documentsTitle} | ${siteConfig.siteName}`,
-    description: t.documentsIntro
+    title: page.seo?.metaTitle ?? `${page.title} | ${siteConfig.siteName}`,
+    description: page.seo?.metaDescription ?? page.intro
   };
 }
 
@@ -27,17 +35,19 @@ export default async function DocumentsPage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const t = dictionary[locale];
-  const [siteConfig, documents] = await Promise.all([
+  const [page, siteConfig, documents] = await Promise.all([
+    fetchPageBySlug(locale, "documents"),
     fetchSiteConfig(locale),
     fetchDocuments(locale)
   ]);
 
+  if (!page) notFound();
+
   return (
     <>
       <PageTitle
-        title={t.documentsTitle}
-        intro={t.documentsIntro}
+        title={page.title}
+        intro={page.intro}
         crumb={getNavLabel(siteConfig, "documents")}
       />
       <section className="section">

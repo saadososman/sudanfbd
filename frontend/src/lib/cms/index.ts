@@ -43,5 +43,6 @@ export type {
   CmsPageSection,
   CmsSector,
   CmsSiteConfig,
+  CmsUiLabels,
   SectorCategory
 } from "@/lib/cms/types";

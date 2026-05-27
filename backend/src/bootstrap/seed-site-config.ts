@@ -16,13 +16,19 @@ export async function seedSiteConfig(strapi: SeedStrapi) {
       (await documents.findFirst({ locale, status: "published" })) ??
       (await documents.findFirst({ locale }));
 
+    const seed = getSiteConfigSeed(locale);
     const siteName = existing?.siteName;
-    if (typeof siteName === "string" && siteName.trim()) {
+    const hasUiLabels =
+      existing?.uiLabels &&
+      typeof existing.uiLabels === "object" &&
+      typeof (existing.uiLabels as { search?: unknown }).search === "string" &&
+      Boolean((existing.uiLabels as { search: string }).search.trim());
+
+    if (typeof siteName === "string" && siteName.trim() && hasUiLabels) {
       strapi.log.info(`Site config seed skipped for ${locale}: already populated.`);
       continue;
     }
 
-    const seed = getSiteConfigSeed(locale);
     let documentId = getDocumentId(existing);
 
     if (documentId) {

@@ -1,6 +1,12 @@
 export type SeedLocale = "ar" | "en";
 
-export type PageSlug = "about" | "objectives" | "methodology" | "framework";
+export type PageSlug =
+  | "about"
+  | "objectives"
+  | "methodology"
+  | "framework"
+  | "documents"
+  | "admin";
 
 type NavSeed = {
   label: string;
@@ -24,6 +30,7 @@ type SiteConfigSeed = {
   footerNote: string;
   navigation: NavSeed[];
   defaultSeo: SeoSeed;
+  uiLabels: LocaleCopy["ui"];
 };
 
 type TextCardSeed = {
@@ -99,6 +106,45 @@ type LocaleCopy = {
   ctaBannerBody: string;
   insightOne: string;
   insightTwo: string;
+  documentsTitle: string;
+  documentsIntro: string;
+  adminTitle: string;
+  adminIntro: string;
+  ui: {
+    search: string;
+    newsSearch: string;
+    newsLabel: string;
+    noNews: string;
+    readArticle: string;
+    publishedOn: string;
+    backToNews: string;
+    readMore: string;
+    download: string;
+    noDocs: string;
+    upload: string;
+    publish: string;
+    formTitle: string;
+    sector: string;
+    file: string;
+    formLocale: string;
+    statusReady: string;
+    sectorsSearch: string;
+    sectorsEmpty: string;
+    viewSector: string;
+    adminIntegrationTitle: string;
+    adminIntegrationBody: string;
+    uploadDisabled: string;
+    uploading: string;
+    uploadSuccess: string;
+    uploadFailed: string;
+    sectorScopeKicker: string;
+    sectorScopeTitle: string;
+    categoryEconomic: string;
+    categoryServices: string;
+    categoryGovernance: string;
+    categoryInfrastructure: string;
+    categorySocial: string;
+  };
 };
 
 const COPY: Record<SeedLocale, LocaleCopy> = {
@@ -241,7 +287,48 @@ const COPY: Record<SeedLocale, LocaleCopy> = {
     ctaBannerBody:
       "يوظف الخبرات السودانية داخل البلاد وخارجها لإنتاج سياسات وخطط قابلة للتنفيذ تخدم بناء الدولة السودانية الحديثة",
     insightOne: "بيانات ومؤشرات",
-    insightTwo: "حوكمة وشراكات"
+    insightTwo: "حوكمة وشراكات",
+    documentsTitle: "مكتبة الوثائق",
+    documentsIntro:
+      "ارفع وحمل ملفات PDF الخاصة بالتقارير، السياسات، الدراسات، وخطط العمل.",
+    adminTitle: "لوحة الإدارة",
+    adminIntro: "إدارة الوثائق المنشورة وربطها بالقطاعات عبر واجهة Strapi.",
+    ui: {
+      search: "بحث",
+      newsSearch: "ابحث في الأخبار",
+      newsLabel: "مقال",
+      noNews: "لا توجد مقالات منشورة بعد.",
+      readArticle: "قراءة المقال",
+      publishedOn: "نُشر في",
+      backToNews: "العودة إلى الأخبار",
+      readMore: "عرض التفاصيل",
+      download: "تحميل PDF",
+      noDocs: "لا توجد وثائق بعد.",
+      upload: "رفع ملف",
+      publish: "نشر",
+      formTitle: "العنوان",
+      sector: "القطاع",
+      file: "ملف PDF",
+      formLocale: "اللغة",
+      statusReady: "جاهز للاتصال بواجهة Strapi.",
+      sectorsSearch: "ابحث في القطاعات",
+      sectorsEmpty: "لا توجد قطاعات منشورة حالياً من لوحة Strapi.",
+      viewSector: "عرض القطاع",
+      adminIntegrationTitle: "تكامل Strapi",
+      adminIntegrationBody:
+        "يتم الرفع عبر مسار Next.js المحمي /api/admin/documents باستخدام STRAPI_API_TOKEN على الخادم فقط. لا حاجة لصلاحيات create العامة في Strapi.",
+      uploadDisabled: "الرفع غير مفعّل. أضف STRAPI_API_TOKEN في إعدادات الخادم.",
+      uploading: "جاري الرفع...",
+      uploadSuccess: "تم رفع الوثيقة بنجاح.",
+      uploadFailed: "تعذر رفع الوثيقة. تحقق من Strapi والرمز المميز.",
+      sectorScopeKicker: "اختصاصات ومجال عمل",
+      sectorScopeTitle: "نطاق العمل",
+      categoryEconomic: "الاقتصاد والإنتاج",
+      categoryServices: "الخدمات الأساسية",
+      categoryGovernance: "الحكم والمؤسسات",
+      categoryInfrastructure: "البنية التحتية والتحول الرقمي",
+      categorySocial: "المجتمع والسلام"
+    }
   },
   en: {
     brand: "Sudanese Forum for Building and Development",
@@ -383,7 +470,49 @@ const COPY: Record<SeedLocale, LocaleCopy> = {
     ctaBannerBody:
       "A national platform bringing together Sudanese expertise to prepare practical visions and plans that support reconstruction, development, and stability during the transitional period.",
     insightOne: "Data and indicators",
-    insightTwo: "Governance and partnerships"
+    insightTwo: "Governance and partnerships",
+    documentsTitle: "Document Library",
+    documentsIntro:
+      "Upload and download PDF reports, policies, studies, and work plans.",
+    adminTitle: "Admin Dashboard",
+    adminIntro:
+      "Manage published documents and connect them to sectors through the Strapi API.",
+    ui: {
+      search: "Search",
+      newsSearch: "Search news",
+      newsLabel: "Article",
+      noNews: "No published articles yet.",
+      readArticle: "Read article",
+      publishedOn: "Published",
+      backToNews: "Back to news",
+      readMore: "View details",
+      download: "Download PDF",
+      noDocs: "No documents yet.",
+      upload: "Upload file",
+      publish: "Publish",
+      formTitle: "Title",
+      sector: "Sector",
+      file: "PDF file",
+      formLocale: "Language",
+      statusReady: "Ready to connect to Strapi.",
+      sectorsSearch: "Search sectors",
+      sectorsEmpty: "No published sectors are available from Strapi yet.",
+      viewSector: "View sector",
+      adminIntegrationTitle: "Strapi Integration",
+      adminIntegrationBody:
+        "Uploads go through the protected Next.js route /api/admin/documents using STRAPI_API_TOKEN on the server only. Public create permissions on Strapi are not required.",
+      uploadDisabled: "Upload disabled. Add STRAPI_API_TOKEN on the server.",
+      uploading: "Uploading...",
+      uploadSuccess: "Document uploaded successfully.",
+      uploadFailed: "Upload failed. Check Strapi and the API token.",
+      sectorScopeKicker: "Mandate and Scope",
+      sectorScopeTitle: "Scope of Work",
+      categoryEconomic: "Economy and Production",
+      categoryServices: "Essential Services",
+      categoryGovernance: "Governance and Institutions",
+      categoryInfrastructure: "Infrastructure and Digital Transformation",
+      categorySocial: "Society and Peace"
+    }
   }
 };
 
@@ -517,6 +646,10 @@ function buildFrameworkSection(locale: SeedLocale) {
   };
 }
 
+function buildUiLabels(locale: SeedLocale) {
+  return { ...t(locale).ui };
+}
+
 export function getSiteConfigSeed(locale: SeedLocale): SiteConfigSeed {
   const copy = t(locale);
   return {
@@ -536,7 +669,8 @@ export function getSiteConfigSeed(locale: SeedLocale): SiteConfigSeed {
     defaultSeo: {
       metaTitle: copy.brand,
       metaDescription: copy.manifesto.paragraphs[0]
-    }
+    },
+    uiLabels: buildUiLabels(locale)
   };
 }
 
@@ -628,6 +762,26 @@ export function getPageSeed(slug: PageSlug, locale: SeedLocale) {
           metaDescription: copy.framework.intro
         },
         sections: [buildFrameworkSection(locale)]
+      };
+    case "documents":
+      return {
+        title: copy.documentsTitle,
+        intro: copy.documentsIntro,
+        seo: {
+          metaTitle: `${copy.documentsTitle} | ${copy.brand}`,
+          metaDescription: copy.documentsIntro
+        },
+        sections: []
+      };
+    case "admin":
+      return {
+        title: copy.adminTitle,
+        intro: copy.adminIntro,
+        seo: {
+          metaTitle: `${copy.adminTitle} | ${copy.brand}`,
+          metaDescription: copy.adminIntro
+        },
+        sections: []
       };
   }
 }
