@@ -2,6 +2,7 @@
   "collectionName": "components_sections_stats_sections",
   "info": {
     "displayName": "Stats Section",
+    "description": "Homepage statistics row with numeric values and labels",
     "icon": "chartCircle"
   },
   "options": {},

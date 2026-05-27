@@ -1,4 +1,5 @@
 import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
+import { mergeHomepageWithCms } from "@/lib/cms/homepage-merge";
 import {
   mapHomeSections,
   mapSeo,
@@ -13,25 +14,31 @@ type HomepagePayload = {
   sections?: unknown;
 };
 
+const homepagePopulate =
+  "populate[sections][on][sections.hero-section][populate][primaryCta]=*" +
+  "&populate[sections][on][sections.hero-section][populate][secondaryCta]=*" +
+  "&populate[sections][on][sections.hero-section][populate][image]=*" +
+  "&populate[sections][on][sections.stats-section][populate][stats]=*" +
+  "&populate[sections][on][sections.objectives-section][populate][cards]=*" +
+  "&populate[sections][on][sections.content-teaser-section][populate]=*" +
+  "&populate[sections][on][sections.cta-banner-section][populate][cta]=*" +
+  "&populate[seo][populate][ogImage]=*";
+
 export async function fetchHomepage(locale: Locale): Promise<CmsHomepage> {
   const fallback = getFallbackHomepage(locale);
 
   const payload = await strapiFetch<{ data?: Record<string, unknown> | null }>(
-    "/api/homepage?populate[sections][populate]=*&populate[seo][populate][ogImage]=*",
+    `/api/homepage?${homepagePopulate}`,
     { locale, revalidate: 300, tags: [`homepage-${locale}`] }
   );
 
   const fields = unwrapSingleType<HomepagePayload>(payload);
   if (!fields) return fallback;
 
-  const sections = mapHomeSections(fields.sections);
-
-  if (!sections.length) {
-    return fallback;
-  }
+  const cmsSections = mapHomeSections(fields.sections);
 
   return {
     seo: mapSeo(fields) ?? fallback.seo,
-    sections
+    sections: mergeHomepageWithCms(fallback, cmsSections).sections
   };
 }

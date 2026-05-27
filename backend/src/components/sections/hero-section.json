@@ -2,6 +2,7 @@
   "collectionName": "components_sections_hero_sections",
   "info": {
     "displayName": "Hero Section",
+    "description": "Homepage hero banner with headline, CTAs, image, and insight badges",
     "icon": "picture"
   },
   "options": {},

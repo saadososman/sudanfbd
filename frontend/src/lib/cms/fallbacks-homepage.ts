@@ -1,3 +1,4 @@
+import { getFallbackHeroSection, getFallbackStatsSection } from "@/lib/cms/fallbacks-hero-stats";
 import type { Locale } from "@/lib/i18n";
 import { dictionary } from "@/lib/i18n";
 import type { CmsHomepage, CmsHomeSection } from "@/lib/cms/types";
@@ -12,33 +13,8 @@ export function getFallbackHomepage(locale: Locale): CmsHomepage {
       metaDescription: t.manifesto.paragraphs[0]
     },
     sections: [
-      {
-        __component: "sections.hero-section",
-        eyebrow: t.hero.eyebrow,
-        title: t.hero.title,
-        body: t.hero.body,
-        primaryCta: {
-          label: t.hero.sectorsCta,
-          path: "sectors",
-          variant: "primary"
-        },
-        secondaryCta: {
-          label: t.hero.docsCta,
-          path: "documents",
-          variant: "secondary",
-          icon: "FileText"
-        },
-        insightOne: isArabic ? "بيانات ومؤشرات" : "Data and indicators",
-        insightTwo: isArabic ? "حوكمة وشراكات" : "Governance and partnerships"
-      },
-      {
-        __component: "sections.stats-section",
-        stats: t.stats.map((stat, index) => ({
-          value: stat.split(" ")[0],
-          label: stat,
-          order: index
-        }))
-      },
+      getFallbackHeroSection(locale),
+      getFallbackStatsSection(locale),
       {
         __component: "sections.about-section",
         kicker: t.manifesto.kicker,

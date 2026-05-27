@@ -2,6 +2,11 @@ export { fetchActiveAnnouncements } from "@/lib/cms/announcements";
 export { fetchSiteConfig } from "@/lib/cms/site-config";
 export { fetchHomepage } from "@/lib/cms/homepage";
 export { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
+export {
+  getFallbackHeroSection,
+  getFallbackStatsSection
+} from "@/lib/cms/fallbacks-hero-stats";
+export { mergeHeroSection, mergeStatsSection } from "@/lib/cms/homepage-merge";
 export { fetchPageBySlug, isStaticPageSlug } from "@/lib/cms/pages";
 export { getFallbackPage, STATIC_PAGE_SLUGS } from "@/lib/cms/fallbacks-pages";
 export { buildStaticPageMetadata } from "@/lib/cms/page-metadata";

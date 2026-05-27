@@ -2,6 +2,7 @@
   "collectionName": "components_shared_stat_items",
   "info": {
     "displayName": "Stat Item",
+    "description": "Single statistic with a prominent value and descriptive label",
     "icon": "chartBubble"
   },
   "options": {},
