@@ -1,5 +1,4 @@
-import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
+import { getContentFallback } from "@/lib/cms/fallbacks-content";
 import type {
   CmsAboutSection,
   CmsFrameworkSection,
@@ -7,12 +6,13 @@ import type {
   CmsMissionValuesSection,
   CmsObjectivesSectionBlock
 } from "@/lib/cms/types";
+import type { Locale } from "@/lib/i18n";
 
 export function getFallbackAboutSection(
   locale: Locale,
   compact = false
 ): CmsAboutSection {
-  const manifesto = dictionary[locale].manifesto;
+  const manifesto = getContentFallback(locale).manifesto;
 
   return {
     __component: "sections.about-section",
@@ -25,7 +25,7 @@ export function getFallbackAboutSection(
 }
 
 export function getFallbackObjectivesSection(locale: Locale): CmsObjectivesSectionBlock {
-  const objectives = dictionary[locale].objectives;
+  const objectives = getContentFallback(locale).objectives;
 
   return {
     __component: "sections.objectives-section",
@@ -41,7 +41,7 @@ export function getFallbackObjectivesSection(locale: Locale): CmsObjectivesSecti
 }
 
 export function getFallbackMethodologySection(locale: Locale): CmsMethodologySection {
-  const methodology = dictionary[locale].methodology;
+  const methodology = getContentFallback(locale).methodology;
 
   return {
     __component: "sections.methodology-section",
@@ -56,7 +56,7 @@ export function getFallbackMethodologySection(locale: Locale): CmsMethodologySec
 }
 
 export function getFallbackFrameworkSection(locale: Locale): CmsFrameworkSection {
-  const framework = dictionary[locale].framework;
+  const framework = getContentFallback(locale).framework;
 
   return {
     __component: "sections.framework-section",
@@ -66,14 +66,13 @@ export function getFallbackFrameworkSection(locale: Locale): CmsFrameworkSection
 }
 
 export function getFallbackMissionValuesSection(locale: Locale): CmsMissionValuesSection {
-  const t = dictionary[locale];
-  const isArabic = locale === "ar";
+  const content = getContentFallback(locale);
 
   return {
     __component: "sections.mission-values-section",
-    missionTitle: t.about.mission,
-    missionText: t.about.missionText,
-    valuesTitle: isArabic ? "مبادئ العمل" : "Operating Principles",
-    values: [...t.about.values]
+    missionTitle: content.about.mission,
+    missionText: content.about.missionText,
+    valuesTitle: content.valuesTitle,
+    values: [...content.about.values]
   };
 }

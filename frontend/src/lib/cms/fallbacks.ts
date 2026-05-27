@@ -1,6 +1,6 @@
-import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
+import { getContentFallback } from "@/lib/cms/fallbacks-content";
 import type { CmsSiteConfig } from "@/lib/cms/types";
+import type { Locale } from "@/lib/i18n";
 
 const defaultNavigation = [
   { path: "", icon: undefined },
@@ -14,31 +14,29 @@ const defaultNavigation = [
   { path: "admin", icon: "LayoutDashboard" }
 ] as const;
 
+const navKeys = [
+  "home",
+  "about",
+  "objectives",
+  "sectors",
+  "methodology",
+  "framework",
+  "news",
+  "documents",
+  "admin"
+] as const;
+
 export function getFallbackSiteConfig(locale: Locale): CmsSiteConfig {
-  const t = dictionary[locale];
-  const navKeys = [
-    "home",
-    "about",
-    "objectives",
-    "sectors",
-    "methodology",
-    "framework",
-    "news",
-    "documents",
-    "admin"
-  ] as const;
+  const content = getContentFallback(locale);
 
   return {
-    siteName: t.brand,
-    shortName: t.shortBrand,
-    brandSubtitle: locale === "ar" ? "بناء وتنمية" : "Building & Development",
-    footerTagline: t.hero.body,
-    footerNote:
-      locale === "ar"
-        ? "ألوان مستوحاة من علم السودان وهوية البناء المؤسسي."
-        : "Colors inspired by Sudan's flag and institutional development identity.",
+    siteName: content.brand,
+    shortName: content.shortBrand,
+    brandSubtitle: content.brandSubtitle,
+    footerTagline: content.hero.body,
+    footerNote: content.footerNote,
     navigation: navKeys.map((key, index) => ({
-      label: t.nav[key],
+      label: content.nav[key],
       path: defaultNavigation[index].path,
       icon: defaultNavigation[index].icon,
       order: index,
@@ -46,8 +44,9 @@ export function getFallbackSiteConfig(locale: Locale): CmsSiteConfig {
       openInNewTab: false
     })),
     defaultSeo: {
-      metaTitle: t.brand,
-      metaDescription: t.manifesto.paragraphs[0]
-    }
+      metaTitle: content.brand,
+      metaDescription: content.manifesto.paragraphs[0]
+    },
+    uiLabels: content.ui
   };
 }

@@ -5,8 +5,9 @@ import {
   getFallbackMissionValuesSection,
   getFallbackObjectivesSection
 } from "@/lib/cms/fallbacks-content-sections";
+import { getContentFallback } from "@/lib/cms/fallbacks-content";
 import type { CmsPage, CmsPageSection } from "@/lib/cms/types";
-import { dictionary, type Locale } from "@/lib/i18n";
+import type { Locale } from "@/lib/i18n";
 
 export const STATIC_PAGE_SLUGS = ["about", "objectives", "methodology", "framework"] as const;
 export type StaticPageSlug = (typeof STATIC_PAGE_SLUGS)[number];
@@ -28,50 +29,50 @@ function getFrameworkSections(locale: Locale): CmsPageSection[] {
 }
 
 export function getFallbackPage(slug: StaticPageSlug, locale: Locale): CmsPage {
-  const t = dictionary[locale];
+  const content = getContentFallback(locale);
 
   switch (slug) {
     case "about":
       return {
         slug,
-        title: t.about.title,
-        intro: t.manifesto.paragraphs[0],
+        title: content.about.title,
+        intro: content.manifesto.paragraphs[0],
         seo: {
-          metaTitle: `${t.about.title} | ${t.brand}`,
-          metaDescription: t.manifesto.paragraphs[0]
+          metaTitle: `${content.about.title} | ${content.brand}`,
+          metaDescription: content.manifesto.paragraphs[0]
         },
         sections: getAboutSections(locale)
       };
     case "objectives":
       return {
         slug,
-        title: t.objectives.title,
-        intro: t.objectives.paragraphs[0],
+        title: content.objectives.title,
+        intro: content.objectives.paragraphs[0],
         seo: {
-          metaTitle: `${t.objectives.title} | ${t.brand}`,
-          metaDescription: t.objectives.paragraphs[0]
+          metaTitle: `${content.objectives.title} | ${content.brand}`,
+          metaDescription: content.objectives.paragraphs[0]
         },
         sections: [getFallbackObjectivesSection(locale)]
       };
     case "methodology":
       return {
         slug,
-        title: t.methodology.title,
-        intro: t.methodology.intro,
+        title: content.methodology.title,
+        intro: content.methodology.intro,
         seo: {
-          metaTitle: `${t.methodology.title} | ${t.brand}`,
-          metaDescription: t.methodology.intro
+          metaTitle: `${content.methodology.title} | ${content.brand}`,
+          metaDescription: content.methodology.intro
         },
         sections: getMethodologySections(locale)
       };
     case "framework":
       return {
         slug,
-        title: t.framework.title,
-        intro: t.framework.intro,
+        title: content.framework.title,
+        intro: content.framework.intro,
         seo: {
-          metaTitle: `${t.framework.title} | ${t.brand}`,
-          metaDescription: t.framework.intro
+          metaTitle: `${content.framework.title} | ${content.brand}`,
+          metaDescription: content.framework.intro
         },
         sections: getFrameworkSections(locale)
       };

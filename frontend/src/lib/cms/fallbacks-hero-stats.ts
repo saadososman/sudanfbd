@@ -1,29 +1,28 @@
-import type { Locale } from "@/lib/i18n";
-import { dictionary } from "@/lib/i18n";
+import { getContentFallback } from "@/lib/cms/fallbacks-content";
 import type { CmsHeroSection, CmsStatsSection } from "@/lib/cms/types";
+import type { Locale } from "@/lib/i18n";
 
 export function getFallbackHeroSection(locale: Locale): CmsHeroSection {
-  const t = dictionary[locale];
-  const isArabic = locale === "ar";
+  const content = getContentFallback(locale);
 
   return {
     __component: "sections.hero-section",
-    eyebrow: t.hero.eyebrow,
-    title: t.hero.title,
-    body: t.hero.body,
+    eyebrow: content.hero.eyebrow,
+    title: content.hero.title,
+    body: content.hero.body,
     primaryCta: {
-      label: t.hero.sectorsCta,
+      label: content.hero.sectorsCta,
       path: "sectors",
       variant: "primary"
     },
     secondaryCta: {
-      label: t.hero.docsCta,
+      label: content.hero.docsCta,
       path: "documents",
       variant: "secondary",
       icon: "FileText"
     },
-    insightOne: isArabic ? "بيانات ومؤشرات" : "Data and indicators",
-    insightTwo: isArabic ? "حوكمة وشراكات" : "Governance and partnerships"
+    insightOne: content.insightOne,
+    insightTwo: content.insightTwo
   };
 }
 
