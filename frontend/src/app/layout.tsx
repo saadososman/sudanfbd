@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getSiteUrl } from "@/lib/env";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s | Sudanese Forum for Building and Development"
   },
   description: "Bilingual Arabic and English platform for Sudanese development sectors, publications, and institutional knowledge.",
-  metadataBase: new URL("http://localhost:3000")
+  metadataBase: new URL(getSiteUrl())
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

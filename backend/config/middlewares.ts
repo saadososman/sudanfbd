@@ -1,10 +1,15 @@
 import type { Core } from '@strapi/strapi';
 
-const config: Core.Config.Middlewares = [
+import { buildCorsConfig } from './cors';
+
+const config = (params: Core.Config.Shared.ConfigParams): Core.Config.Middlewares => [
   'strapi::logger',
   'strapi::errors',
   'strapi::security',
-  'strapi::cors',
+  {
+    name: 'strapi::cors',
+    config: buildCorsConfig(params),
+  },
   'strapi::poweredBy',
   'strapi::query',
   'strapi::body',

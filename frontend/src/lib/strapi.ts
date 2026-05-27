@@ -9,8 +9,9 @@ export type Sector = {
   order: number;
 };
 
-const STRAPI_URL =
-  process.env.NEXT_PUBLIC_STRAPI_URL || process.env.STRAPI_URL || "";
+import { getStrapiUrl } from "./env";
+
+const STRAPI_URL = getStrapiUrl();
 
 function getField(item: any, key: string) {
   const source = item.attributes || item;
