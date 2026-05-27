@@ -25,6 +25,14 @@ export function logStrapiUrl(context = "runtime") {
   return url;
 }
 
+export function logCmsEnv(context = "runtime") {
+  const url = getStrapiUrl();
+  const tokenConfigured = Boolean(getStrapiApiToken());
+  console.log(
+    `[CMS] env (${context}): url=${url || "(not configured)"} token=${tokenConfigured ? "set" : "missing"}`
+  );
+}
+
 export function getSiteUrl() {
   const configured = trimUrl(process.env.NEXT_PUBLIC_SITE_URL);
   if (configured) {
