@@ -4,6 +4,7 @@ import {
   logStrapiFetch,
   parseJsonArray,
   strapiFetch,
+  strapiFetchCollection,
   unwrapCollectionItems
 } from "@/lib/cms/client";
 import { StrapiFetchError } from "@/lib/cms/errors";
@@ -149,14 +150,14 @@ const liveSectorFetch = { cacheBust: true } as const;
 export async function fetchSectors(locale: Locale): Promise<CmsSector[]> {
   noStore();
 
-  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+  const { data: payload, meta } = await strapiFetchCollection(
     "/api/sectors?sort=order:asc&populate=*",
-    { locale, ...liveSectorFetch }
+    { locale, pageSize: 100, ...liveSectorFetch }
   );
 
   assertStrapiFetch("sectors", locale, meta, payload);
 
-  const items = unwrapCollectionItems(payload)
+  const items = (payload.data ?? [])
     .map((item) => mapSectorItem(item as Record<string, unknown>, meta.url))
     .filter((item): item is CmsSector => item !== null)
     .sort((a, b) => a.order - b.order);
@@ -171,7 +172,7 @@ export async function fetchSectors(locale: Locale): Promise<CmsSector[]> {
   }
 
   console.log(
-    `[CMS] sectors payload locale=${locale} count=${items.length} titles=${items.map((s) => `${s.slug}:${s.title}`).join("|")}`
+    `[CMS] sectors payload locale=${locale} count=${items.length} totalCount=${meta.totalCount ?? items.length} titles=${items.map((s) => `${s.slug}:${s.title}`).join("|")}`
   );
   logStrapiFetch("sectors", locale, meta, false);
   return items;
@@ -214,14 +215,14 @@ export async function fetchSectorBySlug(locale: Locale, slug: string): Promise<C
 export async function fetchSectorSlugs(): Promise<string[]> {
   noStore();
 
-  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    "/api/sectors?fields[0]=slug&pagination[pageSize]=100",
-    { locale: "en", ...liveSectorFetch }
+  const { data: payload, meta } = await strapiFetchCollection(
+    "/api/sectors?fields[0]=slug",
+    { locale: "en", pageSize: 100, ...liveSectorFetch }
   );
 
   assertStrapiFetch("sector-slugs", "en", meta, payload);
 
-  const slugs = unwrapCollectionItems(payload)
+  const slugs = (payload.data ?? [])
     .map((item) => item.slug)
     .filter((slug): slug is string => typeof slug === "string");
 

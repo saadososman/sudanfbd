@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 import { CmsFetchError } from "@/components/CmsFetchError";
+import { getStrapiUrl } from "@/lib/env";
 import { PageTitle } from "@/components/PageTitle";
 import { SectorDirectory } from "@/components/SectorDirectory";
 import {
@@ -21,6 +24,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
+  noStore();
   const { locale } = await params;
 
   try {
@@ -67,6 +71,11 @@ export default async function SectorsPage({
             <SectorDirectory locale={locale} sectors={sectors} />
           </div>
         </section>
+        <footer className="cms-source-debug" data-cms-source="strapi" aria-live="polite">
+          <p>STRAPI sectors: {sectors.length}</p>
+          <p>CMS URL: {getStrapiUrl() || sectors[0]?.fetchedFromUrl || "(not configured)"}</p>
+          <p>CMS locale: {locale}</p>
+        </footer>
       </>
     );
   } catch (error) {

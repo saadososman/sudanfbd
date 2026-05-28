@@ -5,6 +5,8 @@ export type StrapiFetchMeta = {
   dataLength: number;
   url?: string;
   hasData?: boolean;
+  totalCount?: number;
+  pageCount?: number;
 };
 
 export function measureStrapiDataLength(payload: unknown): number {
@@ -23,6 +25,6 @@ export function logStrapiFetch(
   usedFallback: boolean
 ) {
   console.log(
-    `[CMS] ${label} locale=${locale} status=${meta.status ?? "n/a"} url=${meta.url ?? "n/a"} hasData=${meta.hasData ?? false} dataLength=${meta.dataLength} fallback=${usedFallback}`
+    `[CMS] ${label} locale=${locale} status=${meta.status ?? "n/a"} url=${meta.url ?? "n/a"} hasData=${meta.hasData ?? false} dataLength=${meta.dataLength} totalCount=${meta.totalCount ?? "n/a"} fallback=${usedFallback}`
   );
 }

@@ -130,6 +130,70 @@ export async function strapiFetch<T>(
   }
 }
 
+type StrapiCollectionResponse = {
+  data?: Record<string, unknown>[] | null;
+  meta?: {
+    pagination?: {
+      page?: number;
+      pageCount?: number;
+      pageSize?: number;
+      total?: number;
+    };
+  };
+};
+
+type StrapiCollectionFetchOptions = StrapiFetchOptions & {
+  pageSize?: number;
+};
+
+/** Fetch every page of a Strapi collection (Strapi default limit is 25). */
+export async function strapiFetchCollection(
+  basePath: string,
+  { locale, pageSize = 100, ...options }: StrapiCollectionFetchOptions
+): Promise<{ data: { data: Record<string, unknown>[] }; meta: StrapiFetchMeta }> {
+  const allItems: Record<string, unknown>[] = [];
+  let page = 1;
+  let lastMeta: StrapiFetchMeta = { status: null, dataLength: 0 };
+  let totalCount = 0;
+  let pageCount = 1;
+
+  while (page <= pageCount) {
+    const pageSep = basePath.includes("?") ? "&" : "?";
+    const path = `${basePath}${pageSep}pagination[page]=${page}&pagination[pageSize]=${pageSize}`;
+    const { data: payload, meta } = await strapiFetch<StrapiCollectionResponse>(path, {
+      locale,
+      ...options
+    });
+
+    lastMeta = meta;
+
+    if (!payload || meta.status === null || (meta.status ?? 0) >= 400) {
+      return { data: { data: allItems }, meta: lastMeta };
+    }
+
+    const pageItems = unwrapCollectionItems(payload);
+    allItems.push(...pageItems);
+
+    totalCount = payload.meta?.pagination?.total ?? allItems.length;
+    pageCount = payload.meta?.pagination?.pageCount ?? 1;
+    page += 1;
+  }
+
+  const meta: StrapiFetchMeta = {
+    ...lastMeta,
+    dataLength: allItems.length,
+    hasData: allItems.length > 0,
+    totalCount,
+    pageCount
+  };
+
+  console.log(
+    `[CMS] collection fetched path=${basePath} locale=${locale} items=${allItems.length} totalCount=${totalCount} pages=${pageCount}`
+  );
+
+  return { data: { data: allItems }, meta };
+}
+
 export function unwrapSingleType<T>(payload: { data?: Record<string, unknown> | null } | null) {
   if (!payload?.data) return null;
   return getItemFields(payload.data) as T;

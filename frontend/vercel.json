@@ -5,6 +5,7 @@
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "env": {
-    "NEXT_PUBLIC_STRAPI_URL": "https://sudanfbd-production.up.railway.app"
+    "NEXT_PUBLIC_STRAPI_URL": "https://sudanfbd-production.up.railway.app",
+    "NEXT_PUBLIC_SITE_URL": "https://www.sudanfbd.org"
   }
 }
