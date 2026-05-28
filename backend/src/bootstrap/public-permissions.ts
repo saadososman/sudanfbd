@@ -9,6 +9,8 @@ const PUBLIC_READ_ACTIONS = [
   "api::sector.sector.findOne",
   "api::article.article.find",
   "api::article.article.findOne",
+  "api::news-item.news-item.find",
+  "api::news-item.news-item.findOne",
   "api::forum-document.forum-document.find",
   "api::forum-document.forum-document.findOne",
   "api::announcement.announcement.find",

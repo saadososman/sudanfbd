@@ -60,6 +60,36 @@ function blocksToText(blocks: unknown): string {
   return parts.join(" ");
 }
 
+function mapForumNewsItem(item: Record<string, unknown>): ArticleItem | null {
+  const fields = getItemFields(item);
+  const id = getArticleId(item);
+  const title = fields.title;
+  const content = Array.isArray(fields.content) ? (fields.content as StrapiBlock[]) : [];
+  const excerpt = blocksToText(content);
+
+  if (!id) return null;
+
+  const publishedAt =
+    typeof fields.publishedAt === "string"
+      ? fields.publishedAt
+      : typeof fields.publishedat === "string"
+        ? fields.publishedat
+        : undefined;
+
+  return {
+    id,
+    title: typeof title === "string" && title ? title : "Untitled",
+    excerpt: excerpt.length > 180 ? `${excerpt.slice(0, 177)}...` : excerpt,
+    content,
+    coverImageUrl:
+      getMediaUrl(fields.coverImage) ||
+      getMediaUrl(fields.coverimage) ||
+      getMediaUrl(fields.file) ||
+      undefined,
+    publishedAt
+  };
+}
+
 function mapArticleItem(item: Record<string, unknown>): ArticleItem | null {
   const fields = getItemFields(item);
   const id = getArticleId(item);
@@ -81,6 +111,7 @@ function mapArticleItem(item: Record<string, unknown>): ArticleItem | null {
 }
 
 const articlesQuery = "sort=publishedAt:desc&populate[coverImage]=*";
+const forumNewsQuery = "sort=publishedAt:desc&populate[coverimage]=*&populate[file]=*";
 
 function mapArticlesFromPayload(
   payload: { data?: Record<string, unknown>[] | null } | null
@@ -90,29 +121,63 @@ function mapArticlesFromPayload(
     .filter((item): item is ArticleItem => item !== null);
 }
 
-export async function fetchArticles(locale: Locale): Promise<ArticleItem[]> {
+function mapForumNewsFromPayload(
+  payload: { data?: Record<string, unknown>[] | null } | null
+) {
+  return unwrapCollectionItems(payload)
+    .map((item) => mapForumNewsItem(item as Record<string, unknown>))
+    .filter((item): item is ArticleItem => item !== null);
+}
+
+async function fetchForumNewsItems(locale: Locale, limit: number) {
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    `/api/articles?${articlesQuery}&pagination[pageSize]=100`,
+    `/api/news-items?${forumNewsQuery}&pagination[pageSize]=${limit}`,
     { locale }
   );
 
-  const articles = mapArticlesFromPayload(payload);
-  logStrapiFetch("articles", locale, meta, articles.length === 0);
-  return articles;
+  return {
+    items: mapForumNewsFromPayload(payload),
+    meta
+  };
+}
+
+async function fetchLegacyArticles(locale: Locale, limit: number) {
+  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
+    `/api/articles?${articlesQuery}&pagination[pageSize]=${limit}`,
+    { locale }
+  );
+
+  return {
+    items: mapArticlesFromPayload(payload),
+    meta
+  };
+}
+
+export async function fetchArticles(locale: Locale): Promise<ArticleItem[]> {
+  const forumNews = await fetchForumNewsItems(locale, 100);
+  if (forumNews.items.length) {
+    logStrapiFetch("news-items", locale, forumNews.meta, false);
+    return forumNews.items;
+  }
+
+  const legacy = await fetchLegacyArticles(locale, 100);
+  logStrapiFetch("articles", locale, legacy.meta, legacy.items.length === 0);
+  return legacy.items;
 }
 
 export async function fetchLatestArticles(
   locale: Locale,
   limit = 3
 ): Promise<ArticleItem[]> {
-  const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    `/api/articles?${articlesQuery}&pagination[pageSize]=${limit}`,
-    { locale }
-  );
+  const forumNews = await fetchForumNewsItems(locale, limit);
+  if (forumNews.items.length) {
+    logStrapiFetch(`news-items:latest:${limit}`, locale, forumNews.meta, false);
+    return forumNews.items;
+  }
 
-  const articles = mapArticlesFromPayload(payload);
-  logStrapiFetch(`articles:latest:${limit}`, locale, meta, articles.length === 0);
-  return articles;
+  const legacy = await fetchLegacyArticles(locale, limit);
+  logStrapiFetch(`articles:latest:${limit}`, locale, legacy.meta, legacy.items.length === 0);
+  return legacy.items;
 }
 
 export async function fetchArticle(
@@ -120,6 +185,16 @@ export async function fetchArticle(
   id: string
 ): Promise<ArticleItem | null> {
   if (!id) return null;
+
+  const { data: forumPayload, meta: forumMeta } = await strapiFetch<{
+    data?: Record<string, unknown> | null;
+  }>(`/api/news-items/${encodeURIComponent(id)}?${forumNewsQuery}`, { locale });
+
+  if (forumPayload?.data) {
+    const article = mapForumNewsItem(forumPayload.data as Record<string, unknown>);
+    logStrapiFetch(`news-item:${id}`, locale, forumMeta, !article);
+    if (article) return article;
+  }
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
     `/api/articles/${encodeURIComponent(id)}?populate[coverImage]=*`,
