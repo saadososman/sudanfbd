@@ -11,29 +11,19 @@
   },
   "pluginOptions": {},
   "attributes": {
+    "title": {
+      "type": "string"
+    },
     "slug": {
       "type": "uid"
     },
     "content": {
       "type": "blocks"
     },
-    "file": {
-      "type": "media",
-      "multiple": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
     "sector": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::sector.sector"
-    },
-    "title": {
-      "type": "string"
     },
     "coverimage": {
       "type": "media",
