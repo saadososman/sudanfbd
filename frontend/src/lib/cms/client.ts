@@ -22,6 +22,8 @@ type StrapiFetchOptions = {
   /** @deprecated Unused while Strapi fetches use cache: "no-store". */
   tags?: string[];
   timeoutMs?: number;
+  /** Append a timestamp query param to bypass upstream/CDN caches. */
+  cacheBust?: boolean;
 };
 
 const DEFAULT_FETCH_TIMEOUT_MS = 8000;
@@ -66,7 +68,7 @@ export function parseJsonArray<T>(value: unknown): T[] {
 
 export async function strapiFetch<T>(
   path: string,
-  { locale, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS }: StrapiFetchOptions
+  { locale, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS, cacheBust = false }: StrapiFetchOptions
 ): Promise<{ data: T | null; meta: StrapiFetchMeta }> {
   noStore();
 
@@ -86,7 +88,8 @@ export async function strapiFetch<T>(
   }
 
   const separator = path.includes("?") ? "&" : "?";
-  const url = `${strapiUrl}${path}${separator}locale=${locale}`;
+  const cacheSuffix = cacheBust ? `&_=${Date.now()}` : "";
+  const url = `${strapiUrl}${path}${separator}locale=${locale}${cacheSuffix}`;
 
   console.log(`[CMS] Strapi fetch url=${url} locale=${locale}`);
 

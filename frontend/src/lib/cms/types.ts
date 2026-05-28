@@ -244,4 +244,7 @@ export type CmsSector = {
   icon: string;
   coverImageUrl?: string;
   order: number;
+  updatedAt?: string;
+  publishedAt?: string;
+  fetchedFromUrl?: string;
 };

@@ -28,7 +28,11 @@ function stripRichText(value: unknown) {
   return value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
 }
 
-function mapSectorItem(item: Record<string, unknown>): CmsSector | null {
+function readTimestamp(value: unknown) {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function mapSectorItem(item: Record<string, unknown>, fetchedFromUrl?: string): CmsSector | null {
   const fields =
     item.attributes && typeof item.attributes === "object"
       ? (item.attributes as Record<string, unknown>)
@@ -65,7 +69,10 @@ function mapSectorItem(item: Record<string, unknown>): CmsSector | null {
     category: resolvedCategory,
     icon: typeof fields.icon === "string" ? fields.icon : "clipboard",
     coverImageUrl: getMediaUrl(fields.coverImage ?? fields.coverimage) || undefined,
-    order: typeof fields.order === "number" ? fields.order : 0
+    order: typeof fields.order === "number" ? fields.order : 0,
+    updatedAt: readTimestamp(item.updatedAt ?? fields.updatedAt),
+    publishedAt: readTimestamp(item.publishedAt ?? fields.publishedAt),
+    fetchedFromUrl
   };
 }
 
@@ -84,13 +91,14 @@ function logSectorPayload(
   console.log(
     `[CMS] sector payload slug=${slug} locale=${locale} ${JSON.stringify({
       documentId: rawItem.documentId ?? rawItem.id,
-      updatedAt: rawItem.updatedAt,
-      publishedAt: rawItem.publishedAt,
+      updatedAt: sector.updatedAt,
+      publishedAt: sector.publishedAt,
       title: sector.title,
       summary: sector.summary,
       body: sector.body,
       icon: sector.icon,
-      order: sector.order
+      order: sector.order,
+      fetchedFromUrl: sector.fetchedFromUrl
     })}`
   );
 }
@@ -133,21 +141,23 @@ function assertStrapiFetch(
 }
 
 function sectorBySlugPath(slug: string) {
-  return `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&status=published&populate=*`;
+  return `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&populate=*`;
 }
+
+const liveSectorFetch = { cacheBust: true } as const;
 
 export async function fetchSectors(locale: Locale): Promise<CmsSector[]> {
   noStore();
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    "/api/sectors?sort=order:asc&status=published&populate=*",
-    { locale }
+    "/api/sectors?sort=order:asc&populate=*",
+    { locale, ...liveSectorFetch }
   );
 
   assertStrapiFetch("sectors", locale, meta, payload);
 
   const items = unwrapCollectionItems(payload)
-    .map((item) => mapSectorItem(item as Record<string, unknown>))
+    .map((item) => mapSectorItem(item as Record<string, unknown>, meta.url))
     .filter((item): item is CmsSector => item !== null)
     .sort((a, b) => a.order - b.order);
 
@@ -161,7 +171,7 @@ export async function fetchSectors(locale: Locale): Promise<CmsSector[]> {
   }
 
   console.log(
-    `[CMS] sectors payload locale=${locale} count=${items.length} slugs=${items.map((s) => s.slug).join(",")}`
+    `[CMS] sectors payload locale=${locale} count=${items.length} titles=${items.map((s) => `${s.slug}:${s.title}`).join("|")}`
   );
   logStrapiFetch("sectors", locale, meta, false);
   return items;
@@ -172,13 +182,20 @@ export async function fetchSectorBySlug(locale: Locale, slug: string): Promise<C
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
     sectorBySlugPath(slug),
-    { locale }
+    { locale, ...liveSectorFetch }
   );
 
   assertStrapiFetch(`sector:${slug}`, locale, meta, payload);
 
-  const item = unwrapCollectionItems(payload)[0] as Record<string, unknown> | undefined;
-  const cmsSector = item ? mapSectorItem(item) : null;
+  const rawItems = unwrapCollectionItems(payload);
+  console.log(
+    `[CMS] sector raw response slug=${slug} locale=${locale} count=${rawItems.length} rawTitles=${rawItems
+      .map((item) => String((item as Record<string, unknown>).title ?? ""))
+      .join("|")}`
+  );
+
+  const item = rawItems[0] as Record<string, unknown> | undefined;
+  const cmsSector = item ? mapSectorItem(item, meta.url) : null;
 
   if (!cmsSector || !item) {
     logStrapiFetch(`sector:${slug}`, locale, meta, true);
@@ -198,8 +215,8 @@ export async function fetchSectorSlugs(): Promise<string[]> {
   noStore();
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    "/api/sectors?fields[0]=slug&status=published&pagination[pageSize]=100",
-    { locale: "en" }
+    "/api/sectors?fields[0]=slug&pagination[pageSize]=100",
+    { locale: "en", ...liveSectorFetch }
   );
 
   assertStrapiFetch("sector-slugs", "en", meta, payload);
@@ -225,8 +242,8 @@ export async function fetchSectorIdBySlug(slug: string, locale: Locale = "en") {
   noStore();
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown>[] | null }>(
-    `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&status=published&pagination[pageSize]=1`,
-    { locale }
+    `/api/sectors?filters[slug][$eq]=${encodeURIComponent(slug)}&pagination[pageSize]=1`,
+    { locale, ...liveSectorFetch }
   );
 
   logFinalStrapiUrl(`sector-id:${slug}`, locale, meta);

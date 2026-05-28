@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 import { CheckCircle2 } from "lucide-react";
 import { CmsFetchError } from "@/components/CmsFetchError";
 import { PageTitle } from "@/components/PageTitle";
@@ -17,6 +19,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ locale: Locale; slug: string }>;
 }): Promise<Metadata> {
+  noStore();
   const { locale, slug } = await params;
 
   try {
@@ -39,6 +42,9 @@ export default async function SectorPage({
 }: {
   params: Promise<{ locale: Locale; slug: string }>;
 }) {
+  await connection();
+  noStore();
+
   const { locale, slug } = await params;
 
   try {
@@ -88,6 +94,13 @@ export default async function SectorPage({
             </article>
           </div>
         </section>
+        <footer className="cms-source-debug" data-cms-source="strapi" aria-live="polite">
+          <p>STRAPI title: {sector.title}</p>
+          <p>STRAPI summary: {sector.summary}</p>
+          <p>STRAPI updatedAt: {sector.updatedAt ?? "unknown"}</p>
+          <p>API URL: {sector.fetchedFromUrl ?? "unknown"}</p>
+          <p>CMS locale: {locale}</p>
+        </footer>
       </>
     );
   } catch (error) {
