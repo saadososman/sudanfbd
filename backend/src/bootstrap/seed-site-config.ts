@@ -8,15 +8,27 @@ import { getSiteConfigSeed } from "./seed-data/website-content";
 
 const SITE_CONFIG_UID = "api::site-config.site-config";
 
-function hasValidSocialLinks(value: unknown) {
+function hasOfficialSocialLinks(value: unknown) {
   if (!Array.isArray(value) || !value.length) return false;
 
-  return value.some((item) => {
-    if (!item || typeof item !== "object") return false;
-    const link = item as { url?: unknown; isVisible?: unknown };
-    if (link.isVisible === false) return false;
-    return typeof link.url === "string" && /^https?:\/\//i.test(link.url.trim());
-  });
+  const links = value.filter(
+    (item): item is { platform?: unknown; url?: unknown; isVisible?: unknown } =>
+      Boolean(item) && typeof item === "object"
+  );
+
+  const xLink = links.find((item) => item.platform === "x" && item.isVisible !== false);
+  const facebookLink = links.find(
+    (item) => item.platform === "facebook" && item.isVisible !== false
+  );
+
+  const xUrl = typeof xLink?.url === "string" ? xLink.url.trim().toLowerCase() : "";
+  const facebookUrl =
+    typeof facebookLink?.url === "string" ? facebookLink.url.trim() : "";
+
+  return (
+    xUrl.includes("x.com/sudanfbd") &&
+    facebookUrl === "https://www.facebook.com/profile.php?id=61590061457504"
+  );
 }
 
 export async function seedSiteConfig(strapi: SeedStrapi) {
@@ -34,16 +46,16 @@ export async function seedSiteConfig(strapi: SeedStrapi) {
       typeof existing.uiLabels === "object" &&
       typeof (existing.uiLabels as { search?: unknown }).search === "string" &&
       Boolean((existing.uiLabels as { search: string }).search.trim());
-    const hasSocialLinks = hasValidSocialLinks(existing?.socialLinks);
+    const hasOfficialLinks = hasOfficialSocialLinks(existing?.socialLinks);
 
-    if (typeof siteName === "string" && siteName.trim() && hasUiLabels && hasSocialLinks) {
+    if (typeof siteName === "string" && siteName.trim() && hasUiLabels && hasOfficialLinks) {
       strapi.log.info(`Site config seed skipped for ${locale}: already populated.`);
       continue;
     }
 
     let documentId = getDocumentId(existing);
     const data =
-      typeof siteName === "string" && siteName.trim() && hasUiLabels && !hasSocialLinks
+      typeof siteName === "string" && siteName.trim() && hasUiLabels && !hasOfficialLinks
         ? { socialLinks: seed.socialLinks }
         : seed;
 

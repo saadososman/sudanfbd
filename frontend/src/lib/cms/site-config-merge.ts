@@ -1,5 +1,5 @@
 import type { CmsNavItem, CmsSiteConfig, CmsSocialLink, CmsUiLabels } from "@/lib/cms/types";
-import { isValidSocialLink } from "@/lib/cms/social-links-defaults";
+import { isValidSocialLink, normalizeSocialLink } from "@/lib/cms/social-links-defaults";
 
 type SiteConfigFields = {
   siteName?: string;
@@ -68,13 +68,15 @@ export function mergeSocialLinks(
   const source = cmsLinks.length ? cmsLinks : fallbackLinks;
 
   return source
-    .map((cmsItem) => ({
-      ...cmsItem,
-      label: resolveSocialLabel(cmsItem, fallbackLinks),
-      url: cmsItem.url?.trim() ?? "",
-      isVisible: cmsItem.isVisible !== false,
-      openInNewTab: cmsItem.openInNewTab !== false
-    }))
+    .map((cmsItem) =>
+      normalizeSocialLink({
+        ...cmsItem,
+        label: resolveSocialLabel(cmsItem, fallbackLinks),
+        url: cmsItem.url?.trim() ?? "",
+        isVisible: cmsItem.isVisible !== false,
+        openInNewTab: cmsItem.openInNewTab !== false
+      })
+    )
     .filter(isValidSocialLink)
     .sort((a, b) => a.order - b.order);
 }

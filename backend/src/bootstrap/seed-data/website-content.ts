@@ -539,7 +539,7 @@ const NAV_PATHS = [
 ] as const;
 
 const OFFICIAL_SOCIAL_URLS = {
-  x: "https://x.com/home",
+  x: "https://x.com/sudanfbd",
   facebook: "https://www.facebook.com/profile.php?id=61590061457504"
 } as const;
 
