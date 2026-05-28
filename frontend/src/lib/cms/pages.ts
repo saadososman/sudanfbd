@@ -34,14 +34,7 @@ type PagePayload = {
   sections?: unknown;
 };
 
-const pagePopulate =
-  "populate[sections][on][sections.about-section][populate]=*" +
-  "&populate[sections][on][sections.objectives-section][populate][cards]=*" +
-  "&populate[sections][on][sections.methodology-section][populate][cards]=*" +
-  "&populate[sections][on][sections.framework-section][populate]=*" +
-  "&populate[sections][on][sections.mission-values-section][populate]=*" +
-  "&populate[sections][on][sections.rich-content-section][populate][cards]=*" +
-  "&populate[sections][on][sections.cta-banner-section][populate][cta]=*";
+const pagePopulate = "populate=*";
 
 function mapCmsPage(fields: PagePayload, slug: PageSlug, fallback: CmsPage): CmsPage {
   const cmsSections = mapPageSections(fields.sections);
