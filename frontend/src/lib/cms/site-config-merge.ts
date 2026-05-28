@@ -76,8 +76,7 @@ export function buildSiteConfigFromCms(
         ? fields.footerNote
         : fallback.footerNote,
     logoUrl: fields.logoUrl || fallback.logoUrl,
-    navigation:
-      fields.navigation?.length ? fields.navigation : fallback.navigation,
+    navigation: mergeNavigation(fields.navigation ?? [], fallback.navigation),
     defaultSeo: fields.defaultSeo ?? fallback.defaultSeo,
     uiLabels: mergeUiLabels(fields.uiLabels ?? fallback.uiLabels, fallback.uiLabels)
   };

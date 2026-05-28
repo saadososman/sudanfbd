@@ -1859,3 +1859,29 @@ textarea {
 .cms-source-debug[data-cms-source="strapi"] {
   background: #047857;
 }
+
+.cms-fetch-error {
+  margin: 2rem auto;
+  max-width: 48rem;
+  padding: 1.5rem;
+  border: 2px solid #b91c1c;
+  border-radius: 0.75rem;
+  background: #fef2f2;
+  color: #7f1d1d;
+}
+
+.cms-fetch-error h1 {
+  margin: 0 0 0.75rem;
+  font-size: 1.25rem;
+}
+
+.cms-fetch-error p {
+  margin: 0.5rem 0 0;
+  line-height: 1.5;
+}
+
+.cms-fetch-error code {
+  word-break: break-all;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.875rem;
+}

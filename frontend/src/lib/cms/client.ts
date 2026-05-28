@@ -85,6 +85,8 @@ export async function strapiFetch<T>(
   const separator = path.includes("?") ? "&" : "?";
   const url = `${strapiUrl}${path}${separator}locale=${locale}`;
 
+  console.log(`[CMS] Strapi fetch url=${url} locale=${locale}`);
+
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(timeoutMs),
