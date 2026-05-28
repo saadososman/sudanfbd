@@ -1,3 +1,4 @@
+import { unstable_noStore as noStore } from "next/cache";
 import { getStrapiUrl } from "@/lib/env";
 import {
   measureStrapiDataLength,
@@ -67,6 +68,8 @@ export async function strapiFetch<T>(
   path: string,
   { locale, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS }: StrapiFetchOptions
 ): Promise<{ data: T | null; meta: StrapiFetchMeta }> {
+  noStore();
+
   const strapiUrl = getStrapiUrl();
   const emptyMeta: StrapiFetchMeta = {
     status: null,
@@ -90,7 +93,12 @@ export async function strapiFetch<T>(
   try {
     const res = await fetch(url, {
       signal: AbortSignal.timeout(timeoutMs),
-      cache: "no-store"
+      cache: "no-store",
+      next: { revalidate: 0 },
+      headers: {
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache"
+      }
     });
 
     if (!res.ok) {
