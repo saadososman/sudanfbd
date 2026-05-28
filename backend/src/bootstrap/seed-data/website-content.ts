@@ -540,7 +540,7 @@ const NAV_PATHS = [
 
 const OFFICIAL_SOCIAL_URLS = {
   x: "https://x.com/sudanfbd",
-  facebook: "https://www.facebook.com/profile.php?id=61590061457504"
+  facebook: "https://www.facebook.com/profile.php?id=61590093586555"
 } as const;
 
 function buildSocialLinks(locale: SeedLocale): SocialLinkSeed[] {

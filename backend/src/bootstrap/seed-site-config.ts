@@ -27,7 +27,7 @@ function hasOfficialSocialLinks(value: unknown) {
 
   return (
     xUrl.includes("x.com/sudanfbd") &&
-    facebookUrl === "https://www.facebook.com/profile.php?id=61590061457504"
+    facebookUrl === "https://www.facebook.com/profile.php?id=61590093586555"
   );
 }
 

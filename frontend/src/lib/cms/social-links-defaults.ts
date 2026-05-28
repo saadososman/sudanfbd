@@ -3,7 +3,7 @@ import type { Locale } from "@/lib/i18n";
 
 export const OFFICIAL_SOCIAL_URLS = {
   x: "https://x.com/sudanfbd",
-  facebook: "https://www.facebook.com/profile.php?id=61590061457504"
+  facebook: "https://www.facebook.com/profile.php?id=61590093586555"
 } as const;
 
 const STALE_X_URLS = new Set([
