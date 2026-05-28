@@ -4,6 +4,7 @@ import {
   getFallbackObjectivesSection
 } from "@/lib/cms/fallbacks-content-sections";
 import { getFallbackHeroSection, getFallbackStatsSection } from "@/lib/cms/fallbacks-hero-stats";
+import { reorderHomepageSections } from "@/lib/cms/homepage-sections";
 import type { CmsHomepage, CmsHomeSection } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -15,8 +16,18 @@ export function getFallbackHomepage(locale: Locale): CmsHomepage {
       metaTitle: `${content.brand} | ${content.nav.home}`,
       metaDescription: content.manifesto.paragraphs[0]
     },
-    sections: [
+    sections: reorderHomepageSections([
       getFallbackHeroSection(locale),
+      {
+        __component: "sections.content-teaser-section",
+        kicker: content.homeNewsKicker,
+        title: content.newsTitle,
+        intro: content.newsIntro,
+        contentType: "news",
+        limit: 3,
+        viewAllLabel: content.viewAllNews,
+        viewAllPath: "news"
+      },
       getFallbackStatsSection(locale),
       getFallbackAboutSection(locale),
       getFallbackObjectivesSection(locale),
@@ -31,20 +42,10 @@ export function getFallbackHomepage(locale: Locale): CmsHomepage {
         viewAllPath: "sectors"
       },
       {
-        __component: "sections.content-teaser-section",
-        kicker: content.homeNewsKicker,
-        title: content.newsTitle,
-        intro: content.newsIntro,
-        contentType: "news",
-        limit: 3,
-        viewAllLabel: content.viewAllNews,
-        viewAllPath: "news"
-      },
-      {
         __component: "sections.cta-banner-section",
         title: content.ctaBannerTitle,
         body: content.ctaBannerBody
       }
-    ] satisfies CmsHomeSection[]
+    ] satisfies CmsHomeSection[])
   };
 }

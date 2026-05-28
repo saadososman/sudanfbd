@@ -483,15 +483,18 @@ export async function ContentSectionRenderer({
       section.contentType === "news"
   );
 
-  const newsLimit = sections.reduce((max, section) => {
-    if (
-      section.__component === "sections.content-teaser-section" &&
-      section.contentType === "news"
-    ) {
-      return Math.max(max, section.limit ?? 3);
-    }
-    return max;
-  }, 3);
+  const newsLimit = Math.max(
+    3,
+    sections.reduce((max, section) => {
+      if (
+        section.__component === "sections.content-teaser-section" &&
+        section.contentType === "news"
+      ) {
+        return Math.max(max, section.limit ?? 3);
+      }
+      return max;
+    }, 3)
+  );
 
   const [sectors, articles, siteConfig] = await Promise.all([
     needsSectors ? fetchSectors(locale).catch(() => []) : Promise.resolve([]),

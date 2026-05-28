@@ -1,5 +1,4 @@
 import {
-  findBySlug,
   getDocumentId,
   publishIfSupported,
   SEED_LOCALES,
@@ -14,6 +13,28 @@ function hasFullHomepageSections(sections: unknown) {
   return Array.isArray(sections) && sections.length >= FULL_HOMEPAGE_SECTION_COUNT;
 }
 
+function getSectionIndex(sections: unknown[], matcher: (section: Record<string, unknown>) => boolean) {
+  return sections.findIndex(
+    (section) => section && typeof section === "object" && matcher(section as Record<string, unknown>)
+  );
+}
+
+function isNewsBeforePreamble(sections: unknown) {
+  if (!Array.isArray(sections)) return false;
+
+  const newsIndex = getSectionIndex(
+    sections,
+    (section) =>
+      section.__component === "sections.content-teaser-section" && section.contentType === "news"
+  );
+  const preambleIndex = getSectionIndex(
+    sections,
+    (section) => section.__component === "sections.about-section"
+  );
+
+  return newsIndex >= 0 && preambleIndex >= 0 && newsIndex < preambleIndex;
+}
+
 export async function seedHomepage(strapi: SeedStrapi) {
   const documents = strapi.documents(HOMEPAGE_UID);
 
@@ -22,16 +43,20 @@ export async function seedHomepage(strapi: SeedStrapi) {
       (await documents.findFirst({ locale, status: "published" })) ??
       (await documents.findFirst({ locale }));
 
-    if (hasFullHomepageSections(existing?.sections)) {
-      strapi.log.info(`Homepage seed skipped for ${locale}: full sections already present.`);
+    const seed = getHomepageSeed(locale);
+    const hasFullSections = hasFullHomepageSections(existing?.sections);
+    const hasCorrectOrder = isNewsBeforePreamble(existing?.sections);
+
+    if (hasFullSections && hasCorrectOrder) {
+      strapi.log.info(`Homepage seed skipped for ${locale}: sections already ordered.`);
       continue;
     }
 
-    const seed = getHomepageSeed(locale);
     let documentId = getDocumentId(existing);
+    const data = hasFullSections && !hasCorrectOrder ? { sections: seed.sections } : seed;
 
     if (documentId) {
-      await documents.update({ documentId, locale, data: seed });
+      await documents.update({ documentId, locale, data });
     } else {
       const created = await documents.create({ locale, data: seed });
       documentId = getDocumentId(created);

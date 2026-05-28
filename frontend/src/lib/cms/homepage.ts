@@ -1,5 +1,6 @@
 import { cache } from "react";
 import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
+import { reorderHomepageSections } from "@/lib/cms/homepage-sections";
 import {
   logStrapiFetch,
   mapHomeSections,
@@ -66,7 +67,7 @@ export const fetchHomepageWithSource = cache(async (locale: Locale): Promise<Hom
   }
 
   const rawSectionCount = Array.isArray(fields.sections) ? fields.sections.length : 0;
-  const cmsSections = mapHomeSections(fields.sections);
+  const cmsSections = reorderHomepageSections(mapHomeSections(fields.sections));
 
   if (!cmsSections.length) {
     console.warn(

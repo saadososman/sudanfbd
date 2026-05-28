@@ -285,7 +285,7 @@ const COPY: Record<SeedLocale, LocaleCopy> = {
     sectorsIntro:
       "القطاعات المقترحة في ميثاق تنظيم عمل الملتقى لإعداد قرارات تنفيذية وخطط قصيرة ومتوسطة المدى قابلة للتنفيذ.",
     homeNewsKicker: "آخر الأخبار",
-    newsTitle: "الأخبار والمقالات",
+    newsTitle: "الأخبار",
     newsIntro: "آخر المقالات والتحديثات المنشورة من لوحة Strapi.",
     viewAllNews: "عرض كل الأخبار",
     brandSubtitle: "بناء وتنمية",
@@ -467,7 +467,7 @@ const COPY: Record<SeedLocale, LocaleCopy> = {
     sectorsIntro:
       "The proposed sectors in the forum charter for preparing executive decisions and short- to medium-term implementable plans.",
     homeNewsKicker: "Latest news",
-    newsTitle: "News & Articles",
+    newsTitle: "News",
     newsIntro: "Latest articles and updates published from the Strapi admin panel.",
     viewAllNews: "View all news",
     brandSubtitle: "Building & Development",
@@ -725,6 +725,16 @@ export function getHomepageSeed(locale: SeedLocale) {
     },
     sections: [
       buildHeroSection(locale),
+      {
+        __component: "sections.content-teaser-section" as const,
+        kicker: copy.homeNewsKicker,
+        title: copy.newsTitle,
+        intro: copy.newsIntro,
+        contentType: "news" as const,
+        limit: 3,
+        viewAllLabel: copy.viewAllNews,
+        viewAllPath: "news"
+      },
       buildStatsSection(locale),
       buildAboutSection(locale),
       buildObjectivesSection(locale),
@@ -737,16 +747,6 @@ export function getHomepageSeed(locale: SeedLocale) {
         limit: 6,
         viewAllLabel: copy.viewAllSectors,
         viewAllPath: "sectors"
-      },
-      {
-        __component: "sections.content-teaser-section" as const,
-        kicker: copy.homeNewsKicker,
-        title: copy.newsTitle,
-        intro: copy.newsIntro,
-        contentType: "news" as const,
-        limit: 3,
-        viewAllLabel: copy.viewAllNews,
-        viewAllPath: "news"
       },
       {
         __component: "sections.cta-banner-section" as const,
