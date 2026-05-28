@@ -110,8 +110,8 @@ function mapArticleItem(item: Record<string, unknown>): ArticleItem | null {
   };
 }
 
-const articlesQuery = "sort=publishedAt:desc&populate[coverImage]=*";
-const forumNewsQuery = "sort=publishedAt:desc&populate[coverimage]=*&populate[file]=*";
+const articlesQuery = "sort=publishedAt:desc&populate=*";
+const forumNewsQuery = "sort=publishedAt:desc&populate=*";
 
 function mapArticlesFromPayload(
   payload: { data?: Record<string, unknown>[] | null } | null
@@ -197,7 +197,7 @@ export async function fetchArticle(
   }
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
-    `/api/articles/${encodeURIComponent(id)}?populate[coverImage]=*`,
+    `/api/articles/${encodeURIComponent(id)}?populate=*`,
     { locale }
   );
 
