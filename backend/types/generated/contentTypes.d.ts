@@ -895,6 +895,12 @@ export interface ApiSiteConfigSiteConfig extends Struct.SingleTypeSchema {
           localized: true;
         };
       }>;
+    socialLinks: Schema.Attribute.Component<'shared.social-link', true> &
+      Schema.Attribute.SetPluginOptions<{
+        i18n: {
+          localized: true;
+        };
+      }>;
     uiLabels: Schema.Attribute.Component<'shared.ui-labels', false> &
       Schema.Attribute.SetPluginOptions<{
         i18n: {
