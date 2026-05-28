@@ -494,7 +494,7 @@ export async function ContentSectionRenderer({
   }, 3);
 
   const [sectors, articles, siteConfig] = await Promise.all([
-    needsSectors ? fetchSectors(locale) : Promise.resolve([]),
+    needsSectors ? fetchSectors(locale).catch(() => []) : Promise.resolve([]),
     needsNews
       ? fetchLatestArticles(locale, newsLimit).catch(() => [])
       : Promise.resolve([] as Awaited<ReturnType<typeof fetchLatestArticles>>),
