@@ -5,7 +5,7 @@ import { fetchDocuments } from "@/lib/api";
 import { fetchPageBySlug, fetchSiteConfig, getNavLabel } from "@/lib/cms";
 import type { Locale } from "@/lib/i18n";
 
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params

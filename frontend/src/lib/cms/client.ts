@@ -68,10 +68,17 @@ export async function strapiFetch<T>(
   { locale, timeoutMs = DEFAULT_FETCH_TIMEOUT_MS }: StrapiFetchOptions
 ): Promise<{ data: T | null; meta: StrapiFetchMeta }> {
   const strapiUrl = getStrapiUrl();
-  const emptyMeta: StrapiFetchMeta = { status: null, dataLength: 0 };
+  const emptyMeta: StrapiFetchMeta = {
+    status: null,
+    dataLength: 0,
+    url: strapiUrl || "(not configured)",
+    hasData: false
+  };
 
   if (!strapiUrl) {
-    console.warn(`[CMS] Strapi URL not configured for ${path} locale=${locale}`);
+    console.warn(
+      `[CMS] Strapi URL not configured path=${path} locale=${locale} url=${emptyMeta.url}`
+    );
     return { data: null, meta: emptyMeta };
   }
 
@@ -85,24 +92,28 @@ export async function strapiFetch<T>(
     });
 
     if (!res.ok) {
-      console.warn(`[CMS] Strapi fetch failed status=${res.status} path=${path} locale=${locale}`);
-      return { data: null, meta: { status: res.status, dataLength: 0 } };
+      console.warn(
+        `[CMS] Strapi fetch failed status=${res.status} url=${url} locale=${locale}`
+      );
+      return {
+        data: null,
+        meta: { status: res.status, dataLength: 0, url, hasData: false }
+      };
     }
 
     const json = (await res.json()) as T;
+    const dataLength = measureStrapiDataLength(json);
     const meta: StrapiFetchMeta = {
       status: res.status,
-      dataLength: measureStrapiDataLength(json)
+      dataLength,
+      url,
+      hasData: dataLength > 0
     };
-
-    console.log(
-      `[CMS] Strapi response path=${path} locale=${locale} status=${meta.status} dataLength=${meta.dataLength}`
-    );
 
     return { data: json, meta };
   } catch (error) {
-    console.warn(`[CMS] Strapi fetch error path=${path} locale=${locale}`, error);
-    return { data: null, meta: emptyMeta };
+    console.warn(`[CMS] Strapi fetch error url=${url} locale=${locale}`, error);
+    return { data: null, meta: { ...emptyMeta, url } };
   }
 }
 

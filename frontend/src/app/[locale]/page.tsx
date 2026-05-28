@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { HomeSectionRenderer } from "@/components/HomeSectionRenderer";
-import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
 import { fetchHomepageWithSource } from "@/lib/cms/homepage";
+import { getStrapiUrl } from "@/lib/env";
 import type { Locale } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -33,22 +33,21 @@ export default async function HomePage({
 }) {
   const { locale } = await params;
   const { homepage, source } = await fetchHomepageWithSource(locale);
-  const sections =
-    homepage.sections.length > 0
-      ? homepage.sections
-      : getFallbackHomepage(locale).sections;
   const sourceLabel = source === "strapi" ? "STRAPI" : "FALLBACK";
+  const strapiUrl = getStrapiUrl();
 
   return (
     <>
-      <p
+      <HomeSectionRenderer locale={locale} sections={homepage.sections} />
+      <footer
         className="cms-source-debug"
         aria-live="polite"
         data-cms-source={source}
       >
-        CMS SOURCE: {sourceLabel}
-      </p>
-      <HomeSectionRenderer locale={locale} sections={sections} />
+        <p>CMS SOURCE: {sourceLabel}</p>
+        <p>CMS URL: {strapiUrl || "(not configured)"}</p>
+        <p>CMS locale: {locale}</p>
+      </footer>
     </>
   );
 }

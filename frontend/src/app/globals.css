@@ -1843,13 +1843,17 @@ textarea {
 }
 
 .cms-source-debug {
-  margin: 0;
-  padding: 0.5rem 1rem;
-  font: 600 0.8125rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  margin: 2rem 0 0;
+  padding: 0.75rem 1rem;
+  font: 600 0.8125rem/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   text-align: center;
   letter-spacing: 0.04em;
   color: #fff;
   background: #b45309;
+}
+
+.cms-source-debug p {
+  margin: 0;
 }
 
 .cms-source-debug[data-cms-source="strapi"] {

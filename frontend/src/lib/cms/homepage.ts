@@ -1,6 +1,5 @@
 import { cache } from "react";
 import { getFallbackHomepage } from "@/lib/cms/fallbacks-homepage";
-import { mergeHomepageWithCms } from "@/lib/cms/homepage-merge";
 import {
   logStrapiFetch,
   mapHomeSections,
@@ -85,14 +84,11 @@ export const fetchHomepageWithSource = cache(async (locale: Locale): Promise<Hom
     return { homepage: fallback, source: "fallback" };
   }
 
-  const merged = mergeHomepageWithCms(fallback, cmsSections);
-  const sections = merged.sections.length > 0 ? merged.sections : fallback.sections;
-
   logStrapiFetch("homepage", locale, meta, false);
   return {
     homepage: {
       seo: mapSeo(fields) ?? fallback.seo,
-      sections
+      sections: cmsSections
     },
     source: "strapi"
   };

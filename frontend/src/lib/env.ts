@@ -1,5 +1,7 @@
 const LOCAL_STRAPI_URL = "http://localhost:1337";
 const LOCAL_SITE_URL = "http://localhost:3000";
+/** Railway production backend — used when NEXT_PUBLIC_STRAPI_URL is missing on Vercel. */
+const PRODUCTION_STRAPI_URL = "https://sudanfbd-production.up.railway.app";
 
 function trimUrl(value: string | undefined) {
   return value?.trim().replace(/\/$/, "") ?? "";
@@ -14,6 +16,10 @@ export function getStrapiUrl() {
 
   if (process.env.NODE_ENV === "development") {
     return LOCAL_STRAPI_URL;
+  }
+
+  if (process.env.VERCEL === "1") {
+    return PRODUCTION_STRAPI_URL;
   }
 
   return "";
