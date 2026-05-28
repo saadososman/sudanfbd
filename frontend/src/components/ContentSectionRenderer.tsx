@@ -22,6 +22,7 @@ import { NewsSection } from "@/components/NewsSection";
 import { ObjectivesSection } from "@/components/ObjectivesSection";
 import { SectorGrid } from "@/components/SectorGrid";
 import { fetchLatestArticles } from "@/lib/articles";
+import { getFallbackSiteConfig } from "@/lib/cms/fallbacks";
 import { fetchSiteConfig } from "@/lib/cms/site-config";
 import { fetchSectors } from "@/lib/cms/sectors";
 import type {
@@ -492,9 +493,15 @@ export async function ContentSectionRenderer({
     return max;
   }, 3);
 
-  const sectors = needsSectors ? await fetchSectors(locale) : [];
-  const articles = needsNews ? await fetchLatestArticles(locale, newsLimit) : [];
-  const siteConfig = await fetchSiteConfig(locale);
+  const [sectors, articles, siteConfig] = await Promise.all([
+    needsSectors
+      ? fetchSectors(locale).catch(() => [])
+      : Promise.resolve([] as Awaited<ReturnType<typeof fetchSectors>>),
+    needsNews
+      ? fetchLatestArticles(locale, newsLimit).catch(() => [])
+      : Promise.resolve([] as Awaited<ReturnType<typeof fetchLatestArticles>>),
+    fetchSiteConfig(locale).catch(() => getFallbackSiteConfig(locale))
+  ]);
 
   return sections.map((section, index) =>
     renderContentSection(locale, section, index, {

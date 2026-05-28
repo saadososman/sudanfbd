@@ -20,16 +20,18 @@ export async function HomeSectionRenderer({
     (section) => section.__component !== "sections.hero-section"
   ) as CmsContentSection[];
 
+  const content = await ContentSectionRenderer({
+    locale,
+    sections: contentSections,
+    compactAbout: compactManifesto
+  });
+
   return (
     <>
       {heroSections.map((section, index) => (
         <HeroSection locale={locale} section={section} key={`hero-${index}`} />
       ))}
-      <ContentSectionRenderer
-        locale={locale}
-        sections={contentSections}
-        compactAbout={compactManifesto}
-      />
+      {content}
     </>
   );
 }
