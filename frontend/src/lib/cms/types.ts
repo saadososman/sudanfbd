@@ -15,6 +15,23 @@ export type CmsNavItem = {
   openInNewTab: boolean;
 };
 
+export type CmsSocialPlatform =
+  | "x"
+  | "facebook"
+  | "linkedin"
+  | "instagram"
+  | "youtube"
+  | "other";
+
+export type CmsSocialLink = {
+  platform: CmsSocialPlatform;
+  url: string;
+  label?: string;
+  order: number;
+  isVisible: boolean;
+  openInNewTab: boolean;
+};
+
 export type CmsUiLabels = {
   search: string;
   newsSearch: string;
@@ -59,6 +76,7 @@ export type CmsSiteConfig = {
   footerNote: string;
   logoUrl?: string;
   navigation: CmsNavItem[];
+  socialLinks: CmsSocialLink[];
   defaultSeo?: CmsSeo;
   uiLabels: CmsUiLabels;
 };

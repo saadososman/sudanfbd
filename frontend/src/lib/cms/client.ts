@@ -249,6 +249,46 @@ export function mapNavItems(items: unknown) {
     .sort((a, b) => a.order - b.order);
 }
 
+const socialPlatforms = new Set([
+  "x",
+  "facebook",
+  "linkedin",
+  "instagram",
+  "youtube",
+  "other"
+]);
+
+export function mapSocialLinks(items: unknown) {
+  if (!Array.isArray(items)) return [];
+
+  return items
+    .map((item, index) => {
+      const fields = getItemFields(item as Record<string, unknown>);
+      const platform = fields.platform;
+      const url = fields.url;
+
+      if (typeof platform !== "string" || !socialPlatforms.has(platform)) return null;
+      if (typeof url !== "string") return null;
+
+      return {
+        platform: platform as
+          | "x"
+          | "facebook"
+          | "linkedin"
+          | "instagram"
+          | "youtube"
+          | "other",
+        url,
+        label: typeof fields.label === "string" ? fields.label : undefined,
+        order: typeof fields.order === "number" ? fields.order : index,
+        isVisible: fields.isVisible !== false,
+        openInNewTab: fields.openInNewTab !== false
+      };
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null)
+    .sort((a, b) => a.order - b.order);
+}
+
 export function mapCtaLink(value: unknown) {
   if (!value || typeof value !== "object") return undefined;
 

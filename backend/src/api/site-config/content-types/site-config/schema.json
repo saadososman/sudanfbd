@@ -72,6 +72,16 @@
         }
       }
     },
+    "socialLinks": {
+      "type": "component",
+      "repeatable": true,
+      "component": "shared.social-link",
+      "pluginOptions": {
+        "i18n": {
+          "localized": true
+        }
+      }
+    },
     "defaultSeo": {
       "type": "component",
       "repeatable": false,

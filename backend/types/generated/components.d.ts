@@ -187,6 +187,25 @@ export interface SharedNavItem extends Struct.ComponentSchema {
   };
 }
 
+export interface SharedSocialLink extends Struct.ComponentSchema {
+  collectionName: 'components_shared_social_links';
+  info: {
+    displayName: 'Social Link';
+    icon: 'earth';
+  };
+  attributes: {
+    isVisible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    label: Schema.Attribute.String;
+    openInNewTab: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    platform: Schema.Attribute.Enumeration<
+      ['x', 'facebook', 'linkedin', 'instagram', 'youtube', 'other']
+    > &
+      Schema.Attribute.Required;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
+  };
+}
+
 export interface SharedSeo extends Struct.ComponentSchema {
   collectionName: 'components_shared_seos';
   info: {
@@ -197,6 +216,25 @@ export interface SharedSeo extends Struct.ComponentSchema {
     metaDescription: Schema.Attribute.Text;
     metaTitle: Schema.Attribute.String;
     ogImage: Schema.Attribute.Media<'images'>;
+  };
+}
+
+export interface SharedSocialLink extends Struct.ComponentSchema {
+  collectionName: 'components_shared_social_links';
+  info: {
+    displayName: 'Social Link';
+    icon: 'earth';
+  };
+  attributes: {
+    isVisible: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    label: Schema.Attribute.String;
+    openInNewTab: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<true>;
+    order: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    platform: Schema.Attribute.Enumeration<
+      ['x', 'facebook', 'linkedin', 'instagram', 'youtube', 'other']
+    > &
+      Schema.Attribute.Required;
+    url: Schema.Attribute.String & Schema.Attribute.Required;
   };
 }
 
@@ -287,6 +325,7 @@ declare module '@strapi/strapi' {
       'shared.cta-link': SharedCtaLink;
       'shared.nav-item': SharedNavItem;
       'shared.seo': SharedSeo;
+      'shared.social-link': SharedSocialLink;
       'shared.stat-item': SharedStatItem;
       'shared.text-card': SharedTextCard;
       'shared.ui-labels': SharedUiLabels;

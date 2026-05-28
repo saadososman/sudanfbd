@@ -1,4 +1,5 @@
 import { getContentFallback } from "@/lib/cms/fallbacks-content";
+import { getDefaultSocialLinks } from "@/lib/cms/social-links-defaults";
 import type { CmsSiteConfig } from "@/lib/cms/types";
 import type { Locale } from "@/lib/i18n";
 
@@ -43,6 +44,7 @@ export function getFallbackSiteConfig(locale: Locale): CmsSiteConfig {
       isVisible: true,
       openInNewTab: false
     })),
+    socialLinks: getDefaultSocialLinks(locale),
     defaultSeo: {
       metaTitle: content.brand,
       metaDescription: content.manifesto.paragraphs[0]

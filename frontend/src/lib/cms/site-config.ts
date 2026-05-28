@@ -3,6 +3,7 @@ import {
   logStrapiFetch,
   mapNavItems,
   mapSeo,
+  mapSocialLinks,
   strapiFetch,
   unwrapSingleType
 } from "@/lib/cms/client";
@@ -20,6 +21,7 @@ type SiteConfigPayload = {
   footerNote?: string;
   logo?: unknown;
   navigation?: unknown;
+  socialLinks?: unknown;
   defaultSeo?: unknown;
   uiLabels?: unknown;
 };
@@ -32,7 +34,7 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   const fallback = getFallbackSiteConfig(locale);
 
   const { data: payload, meta } = await strapiFetch<{ data?: Record<string, unknown> | null }>(
-    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[uiLabels]=*",
+    "/api/site-config?populate[logo]=*&populate[navigation]=*&populate[socialLinks]=*&populate[uiLabels]=*",
     { locale }
   );
 
@@ -43,6 +45,7 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
   }
 
   const navigation = mapNavItems(fields.navigation);
+  const socialLinks = mapSocialLinks(fields.socialLinks);
   const uiLabels = mapUiLabels(fields.uiLabels);
   const hasCmsContent = Boolean(
     (typeof fields.siteName === "string" && fields.siteName.trim()) || navigation.length
@@ -64,6 +67,7 @@ export async function fetchSiteConfig(locale: Locale): Promise<CmsSiteConfig> {
     footerNote: typeof fields.footerNote === "string" ? fields.footerNote : undefined,
     logoUrl: getMediaUrl(fields.logo) || undefined,
     navigation,
+    socialLinks,
     defaultSeo: mapSeo(fields),
     uiLabels
   });

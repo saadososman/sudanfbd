@@ -17,6 +17,15 @@ type NavSeed = {
   openInNewTab: boolean;
 };
 
+type SocialLinkSeed = {
+  platform: "x" | "facebook";
+  url: string;
+  label: string;
+  order: number;
+  isVisible: boolean;
+  openInNewTab: boolean;
+};
+
 type SeoSeed = {
   metaTitle: string;
   metaDescription: string;
@@ -29,6 +38,7 @@ type SiteConfigSeed = {
   footerTagline: string;
   footerNote: string;
   navigation: NavSeed[];
+  socialLinks: SocialLinkSeed[];
   defaultSeo: SeoSeed;
   uiLabels: LocaleCopy["ui"];
 };
@@ -528,6 +538,37 @@ const NAV_PATHS = [
   { path: "admin", icon: "LayoutDashboard" }
 ] as const;
 
+const OFFICIAL_SOCIAL_URLS = {
+  x: "https://x.com/home",
+  facebook: "https://www.facebook.com/profile.php?id=61590061457504"
+} as const;
+
+function buildSocialLinks(locale: SeedLocale): SocialLinkSeed[] {
+  const labels =
+    locale === "ar"
+      ? { x: "X", facebook: "فيسبوك" }
+      : { x: "X", facebook: "Facebook" };
+
+  return [
+    {
+      platform: "x",
+      url: OFFICIAL_SOCIAL_URLS.x,
+      label: labels.x,
+      order: 0,
+      isVisible: true,
+      openInNewTab: true
+    },
+    {
+      platform: "facebook",
+      url: OFFICIAL_SOCIAL_URLS.facebook,
+      label: labels.facebook,
+      order: 1,
+      isVisible: true,
+      openInNewTab: true
+    }
+  ];
+}
+
 const NAV_KEYS = [
   "home",
   "about",
@@ -666,6 +707,7 @@ export function getSiteConfigSeed(locale: SeedLocale): SiteConfigSeed {
       isVisible: true,
       openInNewTab: false
     })),
+    socialLinks: buildSocialLinks(locale),
     defaultSeo: {
       metaTitle: copy.brand,
       metaDescription: copy.manifesto.paragraphs[0]

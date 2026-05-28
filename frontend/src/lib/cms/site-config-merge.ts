@@ -1,4 +1,5 @@
-import type { CmsNavItem, CmsSiteConfig, CmsUiLabels } from "@/lib/cms/types";
+import type { CmsNavItem, CmsSiteConfig, CmsSocialLink, CmsUiLabels } from "@/lib/cms/types";
+import { isValidSocialLink } from "@/lib/cms/social-links-defaults";
 
 type SiteConfigFields = {
   siteName?: string;
@@ -8,6 +9,7 @@ type SiteConfigFields = {
   footerNote?: string;
   logoUrl?: string;
   navigation?: CmsNavItem[];
+  socialLinks?: CmsSocialLink[];
   defaultSeo?: CmsSiteConfig["defaultSeo"];
   uiLabels?: CmsUiLabels;
 };
@@ -48,6 +50,35 @@ export function mergeNavigation(
     .sort((a, b) => a.order - b.order);
 }
 
+function resolveSocialLabel(
+  cmsItem: CmsSocialLink,
+  fallbackLinks: CmsSocialLink[]
+) {
+  if (cmsItem.label?.trim()) return cmsItem.label;
+  return (
+    fallbackLinks.find((item) => item.platform === cmsItem.platform)?.label ??
+    cmsItem.label
+  );
+}
+
+export function mergeSocialLinks(
+  cmsLinks: CmsSocialLink[],
+  fallbackLinks: CmsSocialLink[]
+): CmsSocialLink[] {
+  const source = cmsLinks.length ? cmsLinks : fallbackLinks;
+
+  return source
+    .map((cmsItem) => ({
+      ...cmsItem,
+      label: resolveSocialLabel(cmsItem, fallbackLinks),
+      url: cmsItem.url?.trim() ?? "",
+      isVisible: cmsItem.isVisible !== false,
+      openInNewTab: cmsItem.openInNewTab !== false
+    }))
+    .filter(isValidSocialLink)
+    .sort((a, b) => a.order - b.order);
+}
+
 export function buildSiteConfigFromCms(
   fallback: CmsSiteConfig,
   fields: SiteConfigFields
@@ -77,6 +108,7 @@ export function buildSiteConfigFromCms(
         : fallback.footerNote,
     logoUrl: fields.logoUrl || fallback.logoUrl,
     navigation: mergeNavigation(fields.navigation ?? [], fallback.navigation),
+    socialLinks: mergeSocialLinks(fields.socialLinks ?? [], fallback.socialLinks),
     defaultSeo: fields.defaultSeo ?? fallback.defaultSeo,
     uiLabels: mergeUiLabels(fields.uiLabels ?? fallback.uiLabels, fallback.uiLabels)
   };

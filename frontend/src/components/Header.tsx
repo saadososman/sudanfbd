@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import type { CmsSiteConfig } from "@/lib/cms/types";
 import { dictionary, otherLocale, type Locale } from "@/lib/i18n";
+import { SocialLinks } from "@/components/SocialLinks";
 
 const iconMap: Record<string, LucideIcon> = {
   FileText,
@@ -70,11 +71,14 @@ export function Header({
               );
             })}
         </div>
-        <div className="locale-switch" aria-label="Language switcher">
-          <Link className="locale-link" href={`/${alternate}`}>
-            <Languages size={16} />
-            {dictionary[alternate].langName}
-          </Link>
+        <div className="nav-actions">
+          <SocialLinks links={siteConfig.socialLinks} className="header-social" />
+          <div className="locale-switch" aria-label="Language switcher">
+            <Link className="locale-link" href={`/${alternate}`}>
+              <Languages size={16} />
+              {dictionary[alternate].langName}
+            </Link>
+          </div>
         </div>
       </nav>
     </header>
